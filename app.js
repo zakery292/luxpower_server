@@ -17,6 +17,7 @@ let config = {
     sendToLUX: process.env.SEND_TO_LUX === 'true',
     sendToHomeAssistant: process.env.SEND_TO_HOME_ASSISTANT === 'true',
 };
+console.log("Current configuration:", config);
 
 const LUX_IP = '8.208.83.249'; // LUX IP address
 const LUX_PORT = 4346; // Assuming LUX listens on the same port
