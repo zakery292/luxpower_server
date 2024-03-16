@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Server Configuration</title>
+<style>
+  body { font-family: Arial, sans-serif; }
+  .container { display: flex; }
+  .column { padding: 20px; }
+  .config, .packets { width: 33%; }
+  .packets { overflow-y: auto; height: 400px; }
+  .packets h3 { margin-top: 0; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="column config">
+    <h2>Server Configuration</h2>
+    <form action="/configure" method="post">
+      <label>Dongle IP:</label><input type="text" name="dongleIP" value="{{dongleIP}}" required><br>
+      <label>Home Assistant IP:</label><input type="text" name="homeAssistantIP" value="{{homeAssistantIP}}" required><br>
+      <label>Communicate with Home Assistant</label>
+      <select name="sendToHomeAssistant">
+      <option value="no" {{selectHaNo}}>No</option>
+      <option value="yes" {{selectHaYes}}>Yes</option>
+      </select><br>
+      <label>Communicate with LUX:</label>
+      <select name="sendToLUX">
+        <option value="no" {{selectLuxNo}}>No</option>
+        <option value="yes" {{selectLuxYes}}>Yes</option>
+      </select><br>
+      <input type="submit" value="Save Configuration">
+    </form>
+  </div>
+  <div class="column packets">
+    <h3>Sent Packets</h3>
+    <div id="sentPackets">
+      <!-- Dynamically load last 20 sent packets -->
+    </div>
+  </div>
+  <div class="column packets">
+    <h3>Received Packets</h3>
+    <div id="receivedPackets">
+      <!-- Dynamically load last 20 received packets -->
+    </div>
+  </div>
+</div>
+</body>
+</html>

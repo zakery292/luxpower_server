@@ -1,0 +1,26 @@
+{
+    "name": "Nodejs Server",
+    "version": "1.0",
+    "slug": "nodejs_for_ha",
+    "description": "A TCP server that integrates with Home Assistant",
+    "startup": "application",
+    "boot": "auto",
+    "ports": {
+      "3000/tcp": 3000
+    },
+    "ingress": true,
+    "ingress_port": 3000,
+    "options": {
+      "dongleIP": null,
+      "homeAssistantIP": null,
+      "sendToLUX": false,
+      "sendToHomeAssistant": false
+    },
+    "schema": {
+      "dongleIP": "str",
+      "homeAssistantIP": "str",
+      "sendToLUX": "bool",
+      "sendToHomeAssistant": "bool"
+    }
+  }
+  
