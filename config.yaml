@@ -13,6 +13,7 @@ boot: auto
 host_network: true
 ports:
   "3000/tcp": 3000
+  "4346/tcp": 4346
 ingress: true
 ingress_port: 3000
 options:
