@@ -42,7 +42,7 @@ function logPacket(packetArray, packet, isSent) {
 }
 
 function getNormalizedAddress(address) {
-    if (address.includes('::ffff:')) {
+    if (address && address.includes('::ffff:')) {
         return address.replace('::ffff:', '');
     }
     return address;
