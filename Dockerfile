@@ -11,9 +11,8 @@ RUN npm install
 # Bundle app source
 COPY run.sh app.js index.html ./
 
-# Create a non-root user and switch to it
-RUN adduser -D myuser
-USER myuser
+# Use the node user provided by the official Node.js image
+USER node
 
 # Expose the ports your app runs on
 EXPOSE 3000 4346
