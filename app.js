@@ -1,13 +1,14 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const net = require('net');
+const path = require('path'); // Include the path module
 const app = express();
 const HTTP_PORT = 3000;
 const TCP_PORT = 4346;
 const fs = require('fs');
 
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname)));
+app.use(express.static(path.join(__dirname))); // 
 
 // Configuration now comes from environment variables
 let config = {
