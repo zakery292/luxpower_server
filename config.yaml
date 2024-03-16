@@ -3,7 +3,6 @@ version: "1.0"
 slug: nodejs_for_ha
 description: "A TCP server that integrates with Home Assistant"
 url: "https://github.com/zakery292/homeassistant_nodjs"
-startup: application
 arch:
   - aarch64
   - amd64
