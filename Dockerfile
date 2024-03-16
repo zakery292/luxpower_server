@@ -4,18 +4,19 @@ FROM node:14
 WORKDIR /usr/src/app
 
 # Install app dependencies
-# A wildcard is used to ensure both package.json AND package-lock.json are copied
-# where available (npm@5+)
+# Ensuring both package.json AND package-lock.json are copied
+COPY package*.json ./
 RUN npm install
 
-# Bundle app source
-COPY run.sh app.js index.html ./
+# If npm install fails, the Docker build should fail too
+# This ensures we catch any issues with dependencies early
 
-# Use the node user provided by the official Node.js image
+# Copy the rest of your application code
+COPY . .
+
+# Use the node user for better security
 USER node
 
-# Expose the ports your app runs on
 EXPOSE 3000 4346
 
-# Define the command to run your app using CMD which defines your runtime
 CMD [ "node", "app.js" ]
