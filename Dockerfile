@@ -8,6 +8,8 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm install
 
+# Explicitly install express, useful for debugging or ensuring express is installed
+RUN npm install express
 # If npm install fails, the Docker build should fail too
 # This ensures we catch any issues with dependencies early
 
