@@ -10,7 +10,7 @@ COPY package*.json ./
 RUN npm install
 
 # Bundle app source
-COPY . .
+COPY run.sh app.js index.html ./
 
 # Create a non-root user and switch to it
 RUN adduser -D myuser
