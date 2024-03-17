@@ -5,7 +5,7 @@ const app = express();
 const HTTP_PORT = 3000;
 const TCP_PORT = 4346;
 const fs = require('fs');
-const path = require('path');
+
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -249,7 +249,7 @@ function handleIncomingData(socket, data) {
 
 
 // Update your /configure endpoint to handle sendToHomeAssistant
-app.post('/configure', (req, res) => {
+app.post('configure', (req, res) => {
     console.log(req.body);
     const prevSendToLUX = config.sendToLUX;
     config.dongleIP = req.body.dongleIP;
@@ -266,20 +266,32 @@ app.post('/configure', (req, res) => {
     res.send('Configuration updated successfully');
   });
 app.get('/', (req, res) => {
-  console.log('Accessing root route, loading index.html...');
-  fs.readFile('/usr/src/app/index.html', 'utf8', (err, html) => {
+  fs.readFile('index.html', 'utf8', (err, html) => {
     if (err) {
       console.error('Error reading index.html file:', err);
       return res.status(500).send('Error loading configuration page');
     }
-    console.log('Initial HTML loaded, starting placeholder replacement...');
-    html = html.replace(/{{dongleIP}}/g, config.dongleIP || 'Not set')
-               .replace(/{{homeAssistantIP}}/g, config.homeAssistantIP || 'Not set')
-               .replace(/{{selectHaNo}}/g, !config.sendToHomeAssistant ? 'selected' : '')
-               .replace(/{{selectHaYes}}/g, config.sendToHomeAssistant ? 'selected' : '')
-               .replace(/{{selectLuxNo}}/g, !config.sendToLUX ? 'selected' : '')
-               .replace(/{{selectLuxYes}}/g, config.sendToLUX ? 'selected' : '');
-    console.log('HTML after replacement:', html);
+
+    // Replace configuration placeholders
+    html = html.replace('{{dongleIP}}', config.dongleIP || '')
+               .replace('{{homeAssistantIP}}', config.homeAssistantIP || '')
+               .replace('{{config.sendHaNo}}', selectHaNo)
+               .replace('{{config.sendHaNo}}', selectHaYes)
+               .replace('{{selectNo}}', selectLuxNo)
+               .replace('{{selectNo}}', selectLuxYes)
+
+    // Generate HTML for packets
+    const sentPacketsHtml = sentPackets.slice(-20).map(packet => 
+      `<p>Timestamp: ${packet.timestamp}, Direction: ${packet.direction}, Data: ${packet.data}</p>`
+    ).join('');
+    const receivedPacketsHtml = receivedPackets.slice(-20).map(packet => 
+      `<p>Timestamp: ${packet.timestamp}, Direction: ${packet.direction}, Data: ${packet.data}</p>`
+    ).join('');
+
+    // Inject packet data into HTML
+    html = html.replace('<!-- Dynamically load last 20 sent packets -->', sentPacketsHtml)
+               .replace('<!-- Dynamically load last 20 received packets -->', receivedPacketsHtml);
+
     res.send(html);
   });
 });
