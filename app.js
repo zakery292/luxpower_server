@@ -268,7 +268,7 @@ app.post('/configure', (req, res) => {
 app.get('index.html', (req, res) => {
   console.log('Accessing root route, loading index.html...');
 
-  fs.readFile(path.join(__dirname, 'index.html'), 'utf8', (err, html) => {
+  fs.readFile('/usr/src/app/index.html', 'utf8', (err, html) => {
     if (err) {
       console.error('Error reading index.html file:', err);
       return res.status(500).send('Error loading configuration page');
