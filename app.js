@@ -59,15 +59,16 @@ const CONFIG_FILE = '/data/config.json';
 
 loadConfig();
 
-function logPacket(packetArray, packet, isSent) {
+function logPacket(packetArray, packet, isSent, source) {
   const packetLog = {
     timestamp: new Date().toLocaleString(),
     data: packet.toString('hex'),
-    direction: isSent ? 'Sent' : 'Received'
+    direction: isSent ? 'Sent' : 'Received',
+    source: source // Include the source of the packet
   };
-  packetArray.push(packetLog);
+  packetArray.unshift(packetLog); // Use unshift to add the packet to the beginning of the array
   if (packetArray.length > 20) {
-    packetArray.shift(); // Keep only the last 20 packets
+    packetArray.pop(); // Remove the oldest packet if the array exceeds 20 packets
   }
 }
 
@@ -176,7 +177,6 @@ tcpServer.listen(TCP_PORT, () => {
 function handleIncomingData(socket, data) {
   const remoteAddress = getNormalizedAddress(socket.remoteAddress);
   let source = 'Unknown';
-  let destinations = [];
 
   const normalizedDongleIP = getNormalizedAddress(config.dongleIP);
   const normalizedHomeAssistantIP = getNormalizedAddress(config.homeAssistantIP);
@@ -184,13 +184,15 @@ function handleIncomingData(socket, data) {
 
   if (remoteAddress === normalizedDongleIP) {
     source = 'Dongle';
+    logPacket(receivedPackets, data, false, source);
   } else if (remoteAddress === normalizedHomeAssistantIP) {
     source = 'Home Assistant';
+    logPacket(sentPackets, data, true, source);
   } else if (remoteAddress === normalizedLUX_IP) {
     source = 'LUX';
+    logPacket(sentPackets, data, true, source);
   }
-
-  logPacket(receivedPackets, data, false); // Log received data
+  
   console.log(`${source} sent data: ${data.toString('hex')}`);
 
   // Handling data from Dongle
@@ -242,7 +244,7 @@ function handleIncomingData(socket, data) {
   if (destinations.length) {
     console.log(`${source} sent data to: ${destinations.join(', ')}`);
     destinations.forEach(destination => {
-      logPacket(sentPackets, data, true); // Log sent data for each destination
+      logPacket(sentPackets, data, true, source); // Log sent data for each destination
     });
   } else {
     console.log(`${source} sent data, but no action taken: ${data.toString('hex')}`);
