@@ -290,6 +290,8 @@ app.get('/', (req, res) => {
     // Inject packet data into HTML
     html = html.replace('<!-- Dynamically load last 20 sent packets -->', sentPacketsHtml)
                .replace('<!-- Dynamically load last 20 received packets -->', receivedPacketsHtml);
+      
+    console.log(html); // Add this line before res.send(html);
 
     res.send(html);
   });
