@@ -51,10 +51,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('configurationForm');
   form.onsubmit = function(event) {
     event.preventDefault();
+
     const formData = new FormData(form);
+    console.log('Form Data:', formData);
+
     const object = {};
     formData.forEach((value, key) => { object[key] = value; });
+    console.log('Form Object:', object);
+
     const json = JSON.stringify(object);
+    console.log('JSON to be sent:', json);
 
     fetch('configure', {
       method: 'POST',
@@ -64,6 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
       body: json,
     })
     .then(response => {
+      console.log('Response received:', response);
       if (response.ok) {
         alert('Configuration saved successfully.');
         window.location.reload(); // Reload to see updated values
