@@ -8,7 +8,7 @@ const fs = require('fs');
 
 
 app.use(bodyParser.json());
-app.use(express.static('app/src/usr/'));
+app.use(express.static(__dirname));
 
 
 const LUX_IP = '8.208.83.249'; // LUX IP address
