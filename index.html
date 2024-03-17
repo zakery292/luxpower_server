@@ -17,7 +17,7 @@
 <div class="container">
   <div class="column config">
     <h2>Server Configuration</h2>
-    <form action="configure" method="post">
+    <form action="/configure" method="post" onsubmit="handleSubmit(event)">
       <label>Dongle IP:</label><input type="text" name="dongleIP" value="{{dongleIP}}" required><br>
       <label>Home Assistant IP:</label><input type="text" name="homeAssistantIP" value="{{homeAssistantIP}}" required><br>
       <label>Communicate with Home Assistant</label>
@@ -32,6 +32,28 @@
       </select><br>
       <input type="submit" value="Save Configuration">
     </form>
+<script>
+function handleSubmit(event) {
+  event.preventDefault(); // Prevent default form submission behavior
+  const formData = new FormData(event.target);
+  fetch('/configure', {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => {
+    if (response.ok) {
+      window.location.href = '/'; // Redirect back to the config page
+    } else {
+      alert('Error saving configuration');
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('Error saving configuration');
+  });
+}
+</script>
+    
   </div>
   <div class="column packets">
     <h3>Sent Packets</h3>
