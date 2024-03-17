@@ -4,23 +4,26 @@ FROM node:14
 WORKDIR /usr/src/app
 
 # Install app dependencies
-# Ensuring both package.json AND package-lock.json are copied
 COPY package*.json ./
 RUN npm install
 
-# Explicitly install express, useful for debugging or ensuring express is installed
+# Explicitly install express
 RUN npm install express
-# If npm install fails, the Docker build should fail too
-# This ensures we catch any issues with dependencies early
 
 # Copy the rest of your application code
 COPY . .
 
-# Use the node user for better security
-USER node
+# Ensure run.sh is executable
+RUN chmod +x run.sh
+
+# Switch back to the root user to execute the run.sh script
+# and then it will switch to the 'node' user to run the app
+USER root
 
 EXPOSE 3000 4346
-RUN chmod +x /usr/src/app/run.sh
-CMD [ "/usr/src/app/run.sh" ]
+
+# Execute run.sh when the container starts
+CMD [ "./run.sh" ]
+
 CMD [ "node", "app.js" ]
 
