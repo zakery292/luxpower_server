@@ -10,7 +10,8 @@ RUN npm install
 RUN npm install express
 
 # Copy the rest of your application code
-COPY run.sh index.html app.js styles.css ./
+COPY run.sh index.html app.js ./
+COPY public/ /usr/src/app/public/
 # Ensure run.sh is executable
 RUN chmod +x run.sh
 
