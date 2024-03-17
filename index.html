@@ -46,31 +46,31 @@
     </div>
   </div>
 </div>
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('configurationForm');
-    form.onsubmit = function(event) {
-      event.preventDefault();
-      const formData = new FormData(form);
-      fetch('configure', {
-        method: 'POST',
-        body: formData
-      })
-      .then(response => {
-        if (response.ok) {
-          alert('Configuration saved successfully.');
-          window.location.href = 'index.html'; // Redirect back to the config page
-        } else {
-          alert('Error saving configuration');
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('configurationForm');
+  form.onsubmit = function(event) {
+    event.preventDefault();
+    const formData = new FormData(form);
+    
+    fetch('/configure', {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => {
+      if (response.ok) {
+        alert('Configuration saved successfully.');
+        window.location.href = 'index.html'; // Redirect back to the config page
+      } else {
         alert('Error saving configuration');
-      });
-    };
-  });
-</script>
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Error saving configuration');
+    });
+  };
+});
+
 
 </body>
 </html>
