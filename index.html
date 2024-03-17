@@ -14,6 +14,37 @@
 </style>
 </head>
 <body>
+<script>
+function updatePackets() {
+  // Fetch and update sent packets
+  fetch('/api/sent-packets')
+    .then(response => response.json())
+    .then(data => {
+      const sentPacketsDiv = document.getElementById('sentPackets');
+      sentPacketsDiv.innerHTML = data.map(packet => `<p>Timestamp: ${packet.timestamp}, Direction: ${packet.direction}, Data: ${packet.data}</p>`).join('');
+    })
+    .catch(error => console.error('Error fetching sent packets:', error));
+
+  // Fetch and update received packets
+  fetch('/api/received-packets')
+    .then(response => response.json())
+    .then(data => {
+      const receivedPacketsDiv = document.getElementById('receivedPackets');
+      receivedPacketsDiv.innerHTML = data.map(packet => `<p>Timestamp: ${packet.timestamp}, Direction: ${packet.direction}, Data: ${packet.data}</p>`).join('');
+    })
+    .catch(error => console.error('Error fetching received packets:', error));
+}
+
+// Update packets every 5 seconds
+setInterval(updatePackets, 5000);
+
+// Initial update on page load
+document.addEventListener('DOMContentLoaded', updatePackets);
+</script>
+
+
+
+  
 <div class="container">
   <div class="column config">
     <h2>Server Configuration</h2>
