@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
     event.preventDefault();
     const formData = new FormData(form);
     
-    fetch('/configure', {
+    fetch('configure', {
       method: 'POST',
       body: formData
     })
