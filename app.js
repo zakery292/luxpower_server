@@ -259,6 +259,7 @@ app.post('/configure', (req, res) => {
   
     console.log('Configuration updated:', config);
     saveConfig();
+    res.redirect('/');
   
     // LUX reconnection logic remains the same
   
