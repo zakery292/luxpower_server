@@ -10,9 +10,15 @@ RUN npm install
 RUN npm install express
 
 # Copy the rest of your application code
-COPY run.sh index.html app.js config.json ./
+COPY run.sh index.html app.js ./
 # Ensure run.sh is executable
+USER root
+COPY --chown=node:node config.json /usr/src/app/config.json
+RUN chmod 660 /usr/src/app/config.json
+USER node
+
 RUN chmod +x run.sh
+
 
 EXPOSE 3000 4346
 
