@@ -265,29 +265,25 @@ app.post('/configure', (req, res) => {
   
     res.send('Configuration updated successfully');
   });
-app.get('index.html', (req, res) => {
+app.get('/', (req, res) => {
   console.log('Accessing root route, loading index.html...');
-
   fs.readFile('/usr/src/app/index.html', 'utf8', (err, html) => {
     if (err) {
       console.error('Error reading index.html file:', err);
       return res.status(500).send('Error loading configuration page');
     }
-
     console.log('Initial HTML loaded, starting placeholder replacement...');
-    console.log('Current config:', config);
-
     html = html.replace(/{{dongleIP}}/g, config.dongleIP || 'Not set')
                .replace(/{{homeAssistantIP}}/g, config.homeAssistantIP || 'Not set')
                .replace(/{{selectHaNo}}/g, !config.sendToHomeAssistant ? 'selected' : '')
                .replace(/{{selectHaYes}}/g, config.sendToHomeAssistant ? 'selected' : '')
                .replace(/{{selectLuxNo}}/g, !config.sendToLUX ? 'selected' : '')
                .replace(/{{selectLuxYes}}/g, config.sendToLUX ? 'selected' : '');
-
-    console.log('Placeholder replacement completed, sending modified HTML...');
+    console.log('HTML after replacement:', html);
     res.send(html);
   });
 });
+
 
 function loadConfig() {
   try {
