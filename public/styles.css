@@ -1,11 +1,14 @@
 /* Base styles for the body, setting the font for the entire page */
 body {
   font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
 }
 
 /* Container for the entire page content, enabling flex display for horizontal layout */
 .container {
   display: flex;
+  padding: 20px; /* Added padding around the container for some space */
 }
 
 /* Common styles for each column (configuration and packets) */
@@ -15,9 +18,15 @@ body {
 
 /* Styles for the configuration column */
 .config {
-  width: 25%; /* Adjust the width of the configuration column */
-  display: flex;
+  flex: 0 0 20%; /* Set flex-basis to 20% and flex-grow to 0 */
   flex-direction: column;
+  border-right: 2px solid #ddd; /* Added a border to the right */
+}
+
+/* Styles for the Server Configuration heading */
+.config h2 {
+  font-size: 1.2em; /* Reduced size of the Server Configuration heading */
+  margin-top: 0;
 }
 
 /* Styles for labels in the configuration form */
@@ -28,31 +37,28 @@ body {
 /* Styles for input and select elements in the configuration form */
 .config input,
 .config select {
-  width: 50%; /* Reduce the width of input and select elements */
+  width: 100%; /* Set width to 100% */
+  box-sizing: border-box; /* Added box-sizing */
   margin-bottom: 10px;
 }
 
 /* Styles for the submit button */
 .config input[type="submit"] {
-  width: auto; /* Allow the button to size according to its content */
+  width: 100%; /* Set the button width to 100% */
+  box-sizing: border-box; /* Added box-sizing */
 }
 
 /* Styles for the packets columns (sent and received packets) */
 .packets {
-  width: 37.5%; /* Adjust the width to allocate more space for packets */
+  flex: 1; /* Allow packets columns to take the remaining space */
   overflow-y: auto;
   height: 400px;
+  margin-left: 20px; /* Added margin to the left */
 }
 
 /* Styles for the headings in the packets columns */
 .packets h3 {
   margin-top: 0;
-}
-
-/* Styles for grouping labels and inputs/selects */
-.form-group {
-  display: block;
-  margin-bottom: 10px;
 }
 
 /* Ensure labels are displayed as block elements (on their own line) */
