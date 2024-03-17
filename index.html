@@ -12,13 +12,27 @@
 <body>
   <h1 class="main-heading">Server Monitoring & Configuration</h1>
 <script>
+let lastSentPacketTimestamp = "";
+let lastReceivedPacketTimestamp = "";
+
 function updatePackets() {
   // Fetch and update sent packets
   fetch('api/sent-packets')
     .then(response => response.json())
     .then(data => {
       const sentPacketsDiv = document.getElementById('sentPackets');
-      sentPacketsDiv.innerHTML = data.map(packet => `<p>Timestamp: ${packet.timestamp}, Direction: ${packet.direction}, Data: ${packet.data}</p>`).join('');
+      sentPacketsDiv.innerHTML = "";
+      data.forEach(packet => {
+        const packetElement = document.createElement('p');
+        packetElement.textContent = `Timestamp: ${packet.timestamp}, Direction: ${packet.direction}, Data: ${packet.data}`;
+        if (packet.timestamp !== lastSentPacketTimestamp) {
+          packetElement.classList.add('highlight');
+        }
+        sentPacketsDiv.appendChild(packetElement);
+      });
+      if (data.length) {
+        lastSentPacketTimestamp = data[0].timestamp;
+      }
     })
     .catch(error => console.error('Error fetching sent packets:', error));
 
@@ -27,7 +41,18 @@ function updatePackets() {
     .then(response => response.json())
     .then(data => {
       const receivedPacketsDiv = document.getElementById('receivedPackets');
-      receivedPacketsDiv.innerHTML = data.map(packet => `<p>Timestamp: ${packet.timestamp}, Direction: ${packet.direction}, Data: ${packet.data}</p>`).join('');
+      receivedPacketsDiv.innerHTML = "";
+      data.forEach(packet => {
+        const packetElement = document.createElement('p');
+        packetElement.textContent = `Timestamp: ${packet.timestamp}, Direction: ${packet.direction}, Data: ${packet.data}`;
+        if (packet.timestamp !== lastReceivedPacketTimestamp) {
+          packetElement.classList.add('highlight');
+        }
+        receivedPacketsDiv.appendChild(packetElement);
+      });
+      if (data.length) {
+        lastReceivedPacketTimestamp = data[0].timestamp;
+      }
     })
     .catch(error => console.error('Error fetching received packets:', error));
 }
