@@ -275,21 +275,10 @@ app.get('/', (req, res) => {
     // Update placeholder replacement logic
     html = html.replace(/{{dongleIP}}/g, config.dongleIP || '')
                .replace(/{{homeAssistantIP}}/g, config.homeAssistantIP || '')
-               .replace(/{{config.sendHaNo}}/g, !config.sendToHomeAssistant ? 'selected' : '')
-               .replace(/{{config.sendHaYes}}/g, config.sendToHomeAssistant ? 'selected' : '')
-               .replace(/{{selectNo}}/g, !config.sendToLUX ? 'selected' : '')
-               .replace(/{{selectYes}}/g, config.sendToLUX ? 'selected' : '');
-
-    // Dynamically load packet data
-    const sentPacketsHtml = sentPackets.slice(-20).map(packet => 
-      `<p>Timestamp: ${packet.timestamp}, Direction: ${packet.direction}, Data: ${packet.data}</p>`
-    ).join('');
-    const receivedPacketsHtml = receivedPackets.slice(-20).map(packet => 
-      `<p>Timestamp: ${packet.timestamp}, Direction: ${packet.direction}, Data: ${packet.data}</p>`
-    ).join('');
-
-    html = html.replace('<!-- Dynamically load last 20 sent packets -->', sentPacketsHtml)
-               .replace('<!-- Dynamically load last 20 received packets -->', receivedPacketsHtml);
+               .replace(/{{selectHaNo}}/g, config.sendToHomeAssistant ? '' : 'selected')
+               .replace(/{{selectHaYes}}/g, config.sendToHomeAssistant ? 'selected' : '')
+               .replace(/{{selectLuxNo}}/g, config.sendToLUX ? '' : 'selected')
+               .replace(/{{selectLuxYes}}/g, config.sendToLUX ? 'selected' : '');
 
     res.send(html);
   });
