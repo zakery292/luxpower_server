@@ -7,7 +7,7 @@ const TCP_PORT = 4346;
 const fs = require('fs');
 
 
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 
 const LUX_IP = '8.208.83.249'; // LUX IP address
@@ -250,7 +250,7 @@ function handleIncomingData(socket, data) {
 
 // Update your /configure endpoint to handle sendToHomeAssistant
 app.post('/configure', (req, res) => {
-    console.log(req.body);
+    console.log('Received configuration:', req.body);
     const prevSendToLUX = config.sendToLUX;
     config.dongleIP = req.body.dongleIP;
     config.homeAssistantIP = req.body.homeAssistantIP;
