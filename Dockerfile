@@ -12,9 +12,11 @@ RUN npm install express
 # Copy the rest of your application code
 COPY run.sh index.html app.js config.json ./
 # Ensure run.sh is executable
-RUN chmod a+x run.sh
+RUN chmod +x run.sh
 
 EXPOSE 3000 4346
 
 # Execute run.sh when the container starts
+ENTRYPOINT []
+
 CMD [ "/usr/src/app/run.sh" ]
