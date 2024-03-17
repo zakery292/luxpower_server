@@ -265,7 +265,7 @@ app.post('/configure', (req, res) => {
   });
 
 app.get('/', (req, res) => {
-  fs.readFile('index.html', 'utf8', (err, html) => {
+  fs.readFile('/index.html', 'utf8', (err, html) => {
     if (err) {
       console.error('Error reading index.html file:', err);
       return res.status(500).send('Error loading configuration page');
