@@ -12,6 +12,32 @@
   .packets { overflow-y: auto; height: 400px; }
   .packets h3 { margin-top: 0; }
 </style>
+<head>
+<script>
+  document.addEventListener('DOMContentLoaded', (event) => {
+    function handleSubmit(event) {
+      event.preventDefault();
+      const formData = new FormData(event.target);
+      fetch('/configure', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => {
+        if (response.ok) {
+          window.location.href = '/'; // Redirect back to the config page
+        } else {
+          alert('Error saving configuration');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Error saving configuration');
+      });
+    }
+  });
+</script>
+</head>
+
 </head>
 <body>
 <div class="container">
@@ -32,28 +58,6 @@
       </select><br>
       <input type="submit" value="Save Configuration">
     </form>
-<script>
-function handleSubmit(event) {
-  event.preventDefault(); // Prevent default form submission behavior
-  const formData = new FormData(event.target);
-  fetch('/configure', {
-    method: 'POST',
-    body: formData
-  })
-  .then(response => {
-    if (response.ok) {
-      window.location.href = '/'; // Redirect back to the config page
-    } else {
-      alert('Error saving configuration');
-    }
-  })
-  .catch(error => {
-    console.error('Error:', error);
-    alert('Error saving configuration');
-  });
-}
-</script>
-
     
   </div>
   <div class="column packets">
