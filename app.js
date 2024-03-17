@@ -280,21 +280,21 @@ app.get('/', (req, res) => {
                .replace('{{selectLuxNo}}', !config.sendToLUX ? 'selected' : '')
                .replace('{{selectLuxYes}}', config.sendToLUX ? 'selected' : '');
 
-    // Generate HTML for packets
-    const sentPacketsHtml = sentPackets.slice(-20).map(packet => 
-      `<p>Timestamp: ${packet.timestamp}, Direction: ${packet.direction}, Data: ${packet.data}</p>`
-    ).join('');
-    const receivedPacketsHtml = receivedPackets.slice(-20).map(packet => 
-      `<p>Timestamp: ${packet.timestamp}, Direction: ${packet.direction}, Data: ${packet.data}</p>`
-    ).join('');
-
-    // Inject packet data into HTML
-    html = html.replace('<!-- Dynamically load last 20 sent packets -->', sentPacketsHtml)
-               .replace('<!-- Dynamically load last 20 received packets -->', receivedPacketsHtml);
-
     res.send(html);
   });
 });
+
+
+// Endpoint to get the last 20 sent packets
+app.get('/api/sent-packets', (req, res) => {
+  res.json(sentPackets.slice(-20));
+});
+
+// Endpoint to get the last 20 received packets
+app.get('/api/received-packets', (req, res) => {
+  res.json(receivedPackets.slice(-20));
+});
+
 
 
 function loadConfig() {
