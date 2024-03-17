@@ -264,24 +264,27 @@ app.post('/configure', (req, res) => {
     // LUX reconnection logic remains the same
   
     res.send('Configuration updated successfully');
-    res.redirect('/');
   });
-
 app.get('/', (req, res) => {
+  console.log('Accessing root route, loading index.html...');
+
   fs.readFile(path.join(__dirname, 'index.html'), 'utf8', (err, html) => {
     if (err) {
       console.error('Error reading index.html file:', err);
       return res.status(500).send('Error loading configuration page');
     }
 
-    // Update placeholder replacement logic
-    html = html.replace(/{{dongleIP}}/g, config.dongleIP || '')
-               .replace(/{{homeAssistantIP}}/g, config.homeAssistantIP || '')
-               .replace(/{{selectHaNo}}/g, config.sendToHomeAssistant ? '' : 'selected')
+    console.log('Initial HTML loaded, starting placeholder replacement...');
+    console.log('Current config:', config);
+
+    html = html.replace(/{{dongleIP}}/g, config.dongleIP || 'Not set')
+               .replace(/{{homeAssistantIP}}/g, config.homeAssistantIP || 'Not set')
+               .replace(/{{selectHaNo}}/g, !config.sendToHomeAssistant ? 'selected' : '')
                .replace(/{{selectHaYes}}/g, config.sendToHomeAssistant ? 'selected' : '')
-               .replace(/{{selectLuxNo}}/g, config.sendToLUX ? '' : 'selected')
+               .replace(/{{selectLuxNo}}/g, !config.sendToLUX ? 'selected' : '')
                .replace(/{{selectLuxYes}}/g, config.sendToLUX ? 'selected' : '');
 
+    console.log('Placeholder replacement completed, sending modified HTML...');
     res.send(html);
   });
 });
