@@ -249,7 +249,7 @@ function handleIncomingData(socket, data) {
 
 
 // Update your /configure endpoint to handle sendToHomeAssistant
-app.post('configure', (req, res) => {
+app.post('/configure', (req, res) => {
     console.log(req.body);
     const prevSendToLUX = config.sendToLUX;
     config.dongleIP = req.body.dongleIP;
