@@ -250,6 +250,7 @@ function handleIncomingData(socket, data) {
 
 // Update your /configure endpoint to handle sendToHomeAssistant
 app.post('/configure', (req, res) => {
+    console.log(req.body);
     const prevSendToLUX = config.sendToLUX;
     config.dongleIP = req.body.dongleIP;
     config.homeAssistantIP = req.body.homeAssistantIP;
@@ -265,10 +266,10 @@ app.post('/configure', (req, res) => {
   });
 
 app.get('/', (req, res) => {
-  fs.readFile('/index.html', 'utf8', (err, html) => {
+  res.sendFile(path.join(__dirname, 'index.html'), (err) => {
     if (err) {
       console.error('Error reading index.html file:', err);
-      return res.status(500).send('Error loading configuration page');
+      res.status(500).send('Error loading configuration page');
     }
 
     // Replace configuration placeholders
