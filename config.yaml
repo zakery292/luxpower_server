@@ -1,5 +1,5 @@
 name: Nodejs Server
-version: "1.32"
+version: "1.33"
 slug: nodejs_for_ha
 description: "A TCP server that integrates with Home Assistant"
 url: "https://github.com/zakery292/homeassistant_nodjs"
@@ -20,13 +20,3 @@ ports:
   "4346/tcp": 4346
 ingress: true
 ingress_port: 3000
-options:
-  dongleIP: null
-  homeAssistantIP: null
-  sendToLUX: false
-  sendToHomeAssistant: false
-schema:
-  dongleIP: str
-  homeAssistantIP: str
-  sendToLUX: bool
-  sendToHomeAssistant: bool
