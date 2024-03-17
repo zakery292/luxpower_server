@@ -6,12 +6,14 @@ The Luxpower Dongle Server is designed to interface with BH/BG serial number don
 
 For the server to operate, an external device must be purchased separately from [Renewable Revolution](https://renwablerevolution.co.uk). This device acts as a relay between the dongle and your Home Assistant setup.
 
+[![Open your Home Assistant instance and show the add add-on repository dialog with a specific repository URL pre-filled.](https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg)](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2Fzakery292%2Fhomeassistant_nodjs)
+
 ## How to Use
 
 ### Installation
 
-1. Install the addon through Home Assistant.
-2. Once installed, start the server to access the web UI.
+1. Install the addon through Home Assistant. Either by clicking the button above to add the repo to your addon store or by manually copying the URL of this repo and adding it to the addon store
+3. Once installed, start the server to access the web UI.
 
 ### Configuration
 
