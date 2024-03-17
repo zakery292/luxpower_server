@@ -20,5 +20,7 @@ COPY . .
 USER node
 
 EXPOSE 3000 4346
-
+RUN chmod +x run.sh
+CMD [ "run.sh" ]
 CMD [ "node", "app.js" ]
+
