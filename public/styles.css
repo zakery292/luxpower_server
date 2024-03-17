@@ -35,17 +35,17 @@ body {
 }
 
 /* Styles for input and select elements in the configuration form */
-.config input,
+.config input[type="text"],
 .config select {
-  width: 100%; /* Set width to 100% */
+  width: 70%; /* Set width to 70% */
   box-sizing: border-box; /* Added box-sizing */
   margin-bottom: 10px;
 }
 
 /* Styles for the submit button */
 .config input[type="submit"] {
-  width: 100%; /* Set the button width to 100% */
-  box-sizing: border-box; /* Added box-sizing */
+  width: auto; /* Allow the button to size according to its content */
+  padding: 5px 10px; /* Adjust padding for better appearance */
 }
 
 /* Styles for the packets columns (sent and received packets) */
