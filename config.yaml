@@ -1,7 +1,7 @@
-name: Nodejs Server
-version: "1.91"
+name: Luxpower Dongle Server
+version: "1.92"
 slug: nodejs_for_ha
-description: "A TCP server that integrates with Home Assistant"
+description: "Dongle Server to connect to BH/BG Dongles to enable access into HA Via Luxpython. This server will only work with extral equipment purchased seperatly"
 url: "https://github.com/zakery292/homeassistant_nodjs"
 arch:
   - aarch64
