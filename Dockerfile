@@ -13,11 +13,7 @@ RUN npm install express
 COPY run.sh index.html app.js config.json ./
 
 # Ensure run.sh is executable
-RUN chmod a+x /opt/run.sh
-
-# Switch back to the root user to execute the run.sh script
-# and then it will switch to the 'node' user to run the app
-USER root
+RUN chmod +x ./run.sh
 
 EXPOSE 3000 4346
 
