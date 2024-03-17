@@ -52,10 +52,16 @@ document.addEventListener('DOMContentLoaded', () => {
   form.onsubmit = function(event) {
     event.preventDefault();
     const formData = new FormData(form);
-    
+    const object = {};
+    formData.forEach((value, key) => { object[key] = value });
+    const json = JSON.stringify(object);
+
     fetch('configure', {
       method: 'POST',
-      body: formData
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: json,
     })
     .then(response => {
       if (response.ok) {
