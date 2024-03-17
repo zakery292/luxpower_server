@@ -21,6 +21,7 @@ body {
   flex: 0 0 20%; /* Set flex-basis to 20% and flex-grow to 0 */
   flex-direction: column;
   border-right: 2px solid #ddd; /* Added a border to the right */
+  padding-right: 5px; /* Reduced from 20px to 5px */
 }
 
 /* Styles for the Server Configuration heading */
@@ -32,20 +33,16 @@ body {
 /* Styles for labels in the configuration form */
 .config label {
   margin-bottom: 5px;
+  font-size: 14px;
 }
 
-/* Styles for input and select elements in the configuration form */
+/* Adjusts the styling for inputs and buttons */
 .config input[type="text"],
-.config select {
-  width: 70%; /* Set width to 70% */
-  box-sizing: border-box; /* Added box-sizing */
-  margin-bottom: 10px;
-}
-
-/* Styles for the submit button */
+.config select,
 .config input[type="submit"] {
-  width: auto; /* Allow the button to size according to its content */
-  padding: 5px 10px; /* Adjust padding for better appearance */
+  width: 100%; /* Makes inputs and button take the full width of the form */
+  box-sizing: border-box; /* Ensures padding and borders are included in width */
+  margin-bottom: 10px; /* Adds space below each input/button */
 }
 
 /* Styles for the packets columns (sent and received packets) */
@@ -54,6 +51,12 @@ body {
   overflow-y: auto;
   height: 400px;
   margin-left: 20px; /* Added margin to the left */
+}
+/* Reduces the font size for the packet data and ensures wrapping */
+.packets p {
+  font-size: 12px; /* Adjust as needed to make smaller */
+  white-space: normal; /* Allows text to wrap */
+  word-break: break-word; /* Breaks long words if necessary */
 }
 
 /* Styles for the headings in the packets columns */
