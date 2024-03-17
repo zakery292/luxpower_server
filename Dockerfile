@@ -23,7 +23,4 @@ USER root
 EXPOSE 3000 4346
 
 # Execute run.sh when the container starts
-CMD [ "run.sh" ]
-
-CMD [ "node", "app.js" ]
-
+CMD [ "./run.sh" ]
