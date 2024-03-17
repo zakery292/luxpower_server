@@ -53,7 +53,7 @@ if (config.sendToHomeAssistant) {
 
 
 
-const CONFIG_FILE = './config.json';
+const CONFIG_FILE = '/data/config.json';
 
 loadConfig();
 
