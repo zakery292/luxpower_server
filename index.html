@@ -17,7 +17,7 @@
 <div class="container">
   <div class="column config">
     <h2>Server Configuration</h2>
-    <form id="configurationForm">
+    <form id="configurationForm" action="configure" method="post">
       <label>Dongle IP:</label><input type="text" name="dongleIP" value="{{dongleIP}}" required><br>
       <label>Home Assistant IP:</label><input type="text" name="homeAssistantIP" value="{{homeAssistantIP}}" required><br>
       <label>Communicate with Home Assistant</label>
@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
     formData.forEach((value, key) => { object[key] = value; });
     const json = JSON.stringify(object);
 
-    fetch('/configure', {
+    fetch('configure', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
