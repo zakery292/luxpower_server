@@ -299,15 +299,16 @@ app.get('/', (req, res) => {
 
 function loadConfig() {
   try {
-    const data = fs.readFileSync(CONFIG_FILE, 'utf8');
-    if (data) {
+    if (fs.existsSync(CONFIG_FILE)) {
+      const data = fs.readFileSync(CONFIG_FILE, 'utf8');
       config = JSON.parse(data);
       console.log('Configuration loaded:', config);
     } else {
-      console.log('Configuration file is empty. Using default configuration.');
+      console.log('config.json does not exist. Creating with default configuration.');
+      saveConfig();  // This will create the file with the current config object.
     }
   } catch (err) {
-    console.log('Error loading configuration. Using default configuration:', err);
+    console.log('Error handling the configuration file:', err);
   }
 }
 
