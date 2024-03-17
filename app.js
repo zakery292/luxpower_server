@@ -265,7 +265,7 @@ app.post('/configure', (req, res) => {
   
     res.send('Configuration updated successfully');
   });
-app.get('/', (req, res) => {
+app.get('index.html', (req, res) => {
   console.log('Accessing root route, loading index.html...');
 
   fs.readFile(path.join(__dirname, 'index.html'), 'utf8', (err, html) => {
