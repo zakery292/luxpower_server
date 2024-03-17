@@ -259,11 +259,12 @@ app.post('/configure', (req, res) => {
   
     console.log('Configuration updated:', config);
     saveConfig();
-    res.redirect('/');
+    
   
     // LUX reconnection logic remains the same
   
     res.send('Configuration updated successfully');
+    res.redirect('/');
   });
 
 app.get('/', (req, res) => {
