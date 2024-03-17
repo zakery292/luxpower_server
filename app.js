@@ -8,7 +8,7 @@ const fs = require('fs');
 const path = require('path');
 
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname)));
+
 
 const LUX_IP = '8.208.83.249'; // LUX IP address
 const LUX_PORT = 4346; // Assuming LUX listens on the same port
