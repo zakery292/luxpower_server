@@ -1,21 +1,52 @@
-body { font-family: Arial, sans-serif; }
-.container { display: flex; }
-.column { padding: 20px; }
+body {
+  font-family: Arial, sans-serif;
+}
+
+.container {
+  display: flex;
+}
+
+.column {
+  padding: 20px;
+}
+
 .config {
-  width: 25%; /* Reduce the width of the config column */
+  width: 25%;
   display: flex;
   flex-direction: column;
 }
+
 .config label {
-  margin-bottom: 5px; /* Add some space below the label */
+  margin-bottom: 5px;
 }
+
 .config input,
 .config select {
-  margin-bottom: 10px; /* Add some space below the input/select */
+  width: 100%;
+  margin-bottom: 10px;
 }
+
 .packets {
-  width: 37.5%; /* Increase the width of the packets columns */
+  width: 37.5%;
   overflow-y: auto;
   height: 400px;
 }
-.packets h3 { margin-top: 0; }
+
+.packets h3 {
+  margin-top: 0;
+}
+
+/* New styles for form-group */
+.form-group {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.form-group label {
+  display: block;
+}
+
+.form-group input,
+.form-group select {
+  display: block;
+}
