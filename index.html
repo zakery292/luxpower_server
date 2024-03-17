@@ -64,51 +64,43 @@
   let lastReceivedPacketTimestamp = '';
 
   // Function to update packets
-  function updatePackets() {
-    // Fetch and update sent packets
-    fetch('api/sent-packets')
-      .then(response => response.json())
-      .then(data => {
-        const sentPacketsDiv = document.getElementById('sentPackets');
-        sentPacketsDiv.innerHTML = '';
-        data.forEach(packet => {
-          const packetElement = document.createElement('p');
-          packetElement.textContent = `Timestamp: ${packet.timestamp}, Direction: ${packet.direction}, Data: ${packet.data}`;
-          // Check if this packet is new since the last update
-          if (packet.timestamp > lastSentPacketTimestamp) {
-            packetElement.classList.add('highlight');
-          }
-          sentPacketsDiv.appendChild(packetElement);
-        });
-        // Update the last known packet timestamp
-        if (data.length) {
-          lastSentPacketTimestamp = data[data.length - 1].timestamp;
+function updatePackets() {
+  // Fetch and update sent packets
+  fetch('api/sent-packets')
+    .then(response => response.json())
+    .then(data => {
+      const sentPacketsDiv = document.getElementById('sentPackets');
+      sentPacketsDiv.innerHTML = '';
+      data.reverse().forEach(packet => { // Reverse the data array to show the newest first
+        const packetElement = document.createElement('p');
+        packetElement.textContent = `Timestamp: ${packet.timestamp}, Direction: ${packet.direction}, Data: ${packet.data}`;
+        if (packet.timestamp > lastSentPacketTimestamp) {
+          packetElement.classList.add('highlight');
+          lastSentPacketTimestamp = packet.timestamp; // Update the last known timestamp
         }
-      })
-      .catch(error => console.error('Error fetching sent packets:', error));
+        sentPacketsDiv.insertBefore(packetElement, sentPacketsDiv.firstChild); // Insert new packets at the top
+      });
+    })
+    .catch(error => console.error('Error fetching sent packets:', error));
 
-    // Fetch and update received packets
-    fetch('api/received-packets')
-      .then(response => response.json())
-      .then(data => {
-        const receivedPacketsDiv = document.getElementById('receivedPackets');
-        receivedPacketsDiv.innerHTML = '';
-        data.forEach(packet => {
-          const packetElement = document.createElement('p');
-          packetElement.textContent = `Timestamp: ${packet.timestamp}, Direction: ${packet.direction}, Data: ${packet.data}`;
-          // Check if this packet is new since the last update
-          if (packet.timestamp > lastReceivedPacketTimestamp) {
-            packetElement.classList.add('highlight');
-          }
-          receivedPacketsDiv.appendChild(packetElement);
-        });
-        // Update the last known packet timestamp
-        if (data.length) {
-          lastReceivedPacketTimestamp = data[data.length - 1].timestamp;
+  // Fetch and update received packets
+  fetch('api/received-packets')
+    .then(response => response.json())
+    .then(data => {
+      const receivedPacketsDiv = document.getElementById('receivedPackets');
+      receivedPacketsDiv.innerHTML = '';
+      data.reverse().forEach(packet => { // Reverse the data array to show the newest first
+        const packetElement = document.createElement('p');
+        packetElement.textContent = `Timestamp: ${packet.timestamp}, Direction: ${packet.direction}, Data: ${packet.data}`;
+        if (packet.timestamp > lastReceivedPacketTimestamp) {
+          packetElement.classList.add('highlight');
+          lastReceivedPacketTimestamp = packet.timestamp; // Update the last known timestamp
         }
-      })
-      .catch(error => console.error('Error fetching received packets:', error));
-  }
+        receivedPacketsDiv.insertBefore(packetElement, receivedPacketsDiv.firstChild); // Insert new packets at the top
+      });
+    })
+    .catch(error => console.error('Error fetching received packets:', error));
+}
 
   document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('configurationForm');
