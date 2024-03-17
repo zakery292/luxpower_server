@@ -1,4 +1,4 @@
-#!/usr/bin/with-contenv bashio
+#!/bin/bash
 echo "Starting Node Js Server"
 # Load options from Home Assistant add-on configuration
 echo "Lodoing Congifg"
