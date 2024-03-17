@@ -1,15 +1,29 @@
-/* Base styles for the body, setting the font for the entire page */
+/* Global styles */
 body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
+  background: #f4f4f4; /* Just an example, set the background color you want for the body */
 }
 
-/* Container for the entire page content, enabling flex display for horizontal layout */
+/* Container for the entire page content */
 .container {
   display: flex;
-  padding: 20px; /* Added padding around the container for some space */
+  padding: 20px;
 }
+
+/* Heading for the page */
+.main-heading {
+  text-align: center;
+  font-size: 1.4em; /* Adjust the font size as needed */
+  border-bottom: 2px solid #ddd; /* Set the color to match your borders */
+  margin-bottom: 20px; /* Space below the heading */
+  padding-bottom: 5px; /* Space above the border */
+  margin-left: 20px; /* Adjust as needed to extend the underline */
+  margin-right: 20px; /* Adjust as needed to extend the underline */
+}
+
+
 
 /* Common styles for each column (configuration and packets) */
 .column {
@@ -43,14 +57,16 @@ body {
   width: 100%; /* Makes inputs and button take the full width of the form */
   box-sizing: border-box; /* Ensures padding and borders are included in width */
   margin-bottom: 10px; /* Adds space below each input/button */
+  cursor: pointer; /* Changes cursor to pointer when hovering over the button */
 }
 
-/* Styles for the packets columns (sent and received packets) */
+/* Sent and Received Packets columns */
 .packets {
-  flex: 1; /* Allow packets columns to take the remaining space */
+  flex: 1;
   overflow-y: auto;
   height: 400px;
-  margin-left: 20px; /* Added margin to the left */
+  margin-left: 20px; /* Adjust if you want more space between columns */
+  border-right: 2px solid #ddd; /* Add a border to the right */
 }
 /* Reduces the font size for the packet data and ensures wrapping */
 .packets p {
