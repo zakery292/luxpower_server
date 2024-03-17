@@ -88,3 +88,18 @@ body {
 .form-group select {
   display: block; /* Forces inputs and selects to have their own line */
 }
+
+
+.highlight {
+  animation: highlightAnimation 1s;
+}
+
+@keyframes highlightAnimation {
+  from {
+    background-color: yellow;
+  }
+  to {
+    background-color: transparent;
+  }
+}
+
