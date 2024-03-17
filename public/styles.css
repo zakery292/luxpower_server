@@ -1,51 +1,66 @@
+/* Base styles for the body, setting the font for the entire page */
 body {
   font-family: Arial, sans-serif;
 }
 
+/* Container for the entire page content, enabling flex display for horizontal layout */
 .container {
   display: flex;
 }
 
+/* Common styles for each column (configuration and packets) */
 .column {
   padding: 20px;
 }
 
+/* Styles for the configuration column */
 .config {
-  width: 25%;
+  width: 25%; /* Adjust the width of the configuration column */
   display: flex;
   flex-direction: column;
 }
 
+/* Styles for labels in the configuration form */
 .config label {
   margin-bottom: 5px;
 }
 
+/* Styles for input and select elements in the configuration form */
 .config input,
 .config select {
-  width: 100%;
+  width: 50%; /* Reduce the width of input and select elements */
   margin-bottom: 10px;
 }
 
+/* Styles for the submit button */
+.config input[type="submit"] {
+  width: auto; /* Allow the button to size according to its content */
+}
+
+/* Styles for the packets columns (sent and received packets) */
 .packets {
-  width: 37.5%;
+  width: 37.5%; /* Adjust the width to allocate more space for packets */
   overflow-y: auto;
   height: 400px;
 }
 
+/* Styles for the headings in the packets columns */
 .packets h3 {
   margin-top: 0;
 }
 
-/* New styles for form-group */
+/* Styles for grouping labels and inputs/selects */
 .form-group {
   display: block;
   margin-bottom: 10px;
 }
 
+/* Ensure labels are displayed as block elements (on their own line) */
 .form-group label {
   display: block;
 }
 
+/* Ensure inputs and selects are displayed as block elements (on their own line) */
 .form-group input,
 .form-group select {
   display: block;
