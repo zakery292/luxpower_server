@@ -11,62 +11,7 @@
 </head>
 <body>
   <h1 class="main-heading">Server Monitoring & Configuration</h1>
-<script>
-let lastSentPacketTimestamp = "";
-let lastReceivedPacketTimestamp = "";
 
-function updatePackets() {
-  // Fetch and update sent packets
-  fetch('api/sent-packets')
-    .then(response => response.json())
-    .then(data => {
-      const sentPacketsDiv = document.getElementById('sentPackets');
-      sentPacketsDiv.innerHTML = "";
-      data.forEach(packet => {
-        const packetElement = document.createElement('p');
-        packetElement.textContent = `Timestamp: ${packet.timestamp}, Direction: ${packet.direction}, Data: ${packet.data}`;
-        if (packet.timestamp !== lastSentPacketTimestamp) {
-          packetElement.classList.add('highlight');
-        }
-        sentPacketsDiv.appendChild(packetElement);
-      });
-      if (data.length) {
-        lastSentPacketTimestamp = data[0].timestamp;
-      }
-    })
-    .catch(error => console.error('Error fetching sent packets:', error));
-
-  // Fetch and update received packets
-  fetch('api/received-packets')
-    .then(response => response.json())
-    .then(data => {
-      const receivedPacketsDiv = document.getElementById('receivedPackets');
-      receivedPacketsDiv.innerHTML = "";
-      data.forEach(packet => {
-        const packetElement = document.createElement('p');
-        packetElement.textContent = `Timestamp: ${packet.timestamp}, Direction: ${packet.direction}, Data: ${packet.data}`;
-        if (packet.timestamp !== lastReceivedPacketTimestamp) {
-          packetElement.classList.add('highlight');
-        }
-        receivedPacketsDiv.appendChild(packetElement);
-      });
-      if (data.length) {
-        lastReceivedPacketTimestamp = data[0].timestamp;
-      }
-    })
-    .catch(error => console.error('Error fetching received packets:', error));
-}
-
-// Update packets every 5 seconds
-setInterval(updatePackets, 5000);
-
-// Initial update on page load
-document.addEventListener('DOMContentLoaded', updatePackets);
-</script>
-
-
-
-  
 <div class="container">
   <div class="column config">
     <h2>Server Configuration</h2>
@@ -93,6 +38,10 @@ document.addEventListener('DOMContentLoaded', updatePackets);
           <option value="yes" {{selectLuxYes}}>Yes</option>
         </select>
       </div>
+      <div class="form-group">
+        <label for="refreshRate">Refresh Rate (seconds):</label>
+        <input type="number" id="refreshRate" name="refreshRate" min="1" value="5" required>
+      </div>
       <input type="submit" value="Save Configuration">
     </form>
   </div>
@@ -110,43 +59,92 @@ document.addEventListener('DOMContentLoaded', updatePackets);
   </div>
 </div>
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  const form = document.getElementById('configurationForm');
-  form.onsubmit = function(event) {
-    event.preventDefault();
+  // Variables to keep track of the last known packet timestamps
+  let lastSentPacketTimestamp = '';
+  let lastReceivedPacketTimestamp = '';
 
-    const formData = new FormData(form);
-    console.log('Form Data:', formData);
+  // Function to update packets
+  function updatePackets() {
+    // Fetch and update sent packets
+    fetch('api/sent-packets')
+      .then(response => response.json())
+      .then(data => {
+        const sentPacketsDiv = document.getElementById('sentPackets');
+        sentPacketsDiv.innerHTML = '';
+        data.forEach(packet => {
+          const packetElement = document.createElement('p');
+          packetElement.textContent = `Timestamp: ${packet.timestamp}, Direction: ${packet.direction}, Data: ${packet.data}`;
+          // Check if this packet is new since the last update
+          if (packet.timestamp > lastSentPacketTimestamp) {
+            packetElement.classList.add('highlight');
+          }
+          sentPacketsDiv.appendChild(packetElement);
+        });
+        // Update the last known packet timestamp
+        if (data.length) {
+          lastSentPacketTimestamp = data[data.length - 1].timestamp;
+        }
+      })
+      .catch(error => console.error('Error fetching sent packets:', error));
 
-    const object = {};
-    formData.forEach((value, key) => { object[key] = value; });
-    console.log('Form Object:', object);
+    // Fetch and update received packets
+    fetch('api/received-packets')
+      .then(response => response.json())
+      .then(data => {
+        const receivedPacketsDiv = document.getElementById('receivedPackets');
+        receivedPacketsDiv.innerHTML = '';
+        data.forEach(packet => {
+          const packetElement = document.createElement('p');
+          packetElement.textContent = `Timestamp: ${packet.timestamp}, Direction: ${packet.direction}, Data: ${packet.data}`;
+          // Check if this packet is new since the last update
+          if (packet.timestamp > lastReceivedPacketTimestamp) {
+            packetElement.classList.add('highlight');
+          }
+          receivedPacketsDiv.appendChild(packetElement);
+        });
+        // Update the last known packet timestamp
+        if (data.length) {
+          lastReceivedPacketTimestamp = data[data.length - 1].timestamp;
+        }
+      })
+      .catch(error => console.error('Error fetching received packets:', error));
+  }
 
-    const json = JSON.stringify(object);
-    console.log('JSON to be sent:', json);
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('configurationForm');
+    let refreshIntervalId = setInterval(updatePackets, 5000); // Initialize with default refresh rate
 
-    fetch('configure', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: json,
-    })
-    .then(response => {
-      console.log('Response received:', response);
-      if (response.ok) {
-        alert('Configuration saved successfully.');
-        window.location.reload(); // Reload to see updated values
-      } else {
+    form.onsubmit = function(event) {
+      event.preventDefault();
+
+      const formData = new FormData(form);
+      const json = JSON.stringify(Object.fromEntries(formData));
+      fetch('configure', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: json,
+      })
+      .then(response => {
+        if (response.ok) {
+          alert('Configuration saved successfully.');
+          const refreshRate = parseInt(document.getElementById('refreshRate').value, 10) * 1000;
+          clearInterval(refreshIntervalId);
+          refreshIntervalId = setInterval(updatePackets, refreshRate); // Update the interval with the new rate
+        } else {
+          alert('Error saving configuration');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
         alert('Error saving configuration');
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      alert('Error saving configuration');
-    });
-  };
-});
+      });
+    };
+
+    // Initial update on page load
+    updatePackets();
+  });
 </script>
 
 </body>
