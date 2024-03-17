@@ -13,7 +13,7 @@ RUN npm install express
 COPY run.sh index.html app.js config.json /
 
 # Ensure run.sh is executable
-RUN chmod +x /usr/src/app/run.sh
+RUN chmod +x /run.sh
 
 EXPOSE 3000 4346
 
