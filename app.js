@@ -275,10 +275,10 @@ app.get('/', (req, res) => {
     // Replace configuration placeholders
     html = html.replace('{{dongleIP}}', config.dongleIP || '')
                .replace('{{homeAssistantIP}}', config.homeAssistantIP || '')
-               .replace('{{config.sendHaNo}}', selectHaNo)
-               .replace('{{config.sendHaNo}}', selectHaYes)
-               .replace('{{selectNo}}', selectLuxNo)
-               .replace('{{selectNo}}', selectLuxYes)
+               .replace('{{selectHaNo}}', !config.sendToHomeAssistant ? 'selected' : '')
+               .replace('{{selectHaYes}}', config.sendToHomeAssistant ? 'selected' : '')
+               .replace('{{selectLuxNo}}', !config.sendToLUX ? 'selected' : '')
+               .replace('{{selectLuxYes}}', config.sendToLUX ? 'selected' : '');
 
     // Generate HTML for packets
     const sentPacketsHtml = sentPackets.slice(-20).map(packet => 
