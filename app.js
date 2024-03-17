@@ -81,6 +81,7 @@ function getNormalizedAddress(address) {
         return address.replace('::ffff:', '');
     }
     return address;
+}
 
 
 function connectToLUX() {
