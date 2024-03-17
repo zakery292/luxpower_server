@@ -77,12 +77,11 @@ function saveConfig() {
 }
 
 function getNormalizedAddress(address) {
-  // Normalize IPv4-mapped IPv6 addresses to IPv4
-  if (address.includes('::ffff:')) {
-    return address.replace('::ffff:', '');
-  }
-  return address;
-}
+    if (address && address.includes('::ffff:')) {
+        return address.replace('::ffff:', '');
+    }
+    return address;
+
 
 function connectToLUX() {
   if (!config.sendToLUX || luxSocket) {
