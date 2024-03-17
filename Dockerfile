@@ -17,4 +17,4 @@ RUN chmod a+x run.sh
 EXPOSE 3000 4346
 
 # Execute run.sh when the container starts
-CMD [ "./run.sh" ]
+CMD [ "/usr/src/app/run.sh" ]
