@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
     formData.forEach((value, key) => { object[key] = value; });
     const json = JSON.stringify(object);
 
-    fetch('configure', {
+    fetch('/configure', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
