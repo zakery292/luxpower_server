@@ -266,21 +266,21 @@ app.post('/configure', (req, res) => {
   });
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'), (err) => {
+  fs.readFile(path.join(__dirname, 'index.html'), 'utf8', (err, html) => {
     if (err) {
       console.error('Error reading index.html file:', err);
-      res.status(500).send('Error loading configuration page');
+      return res.status(500).send('Error loading configuration page');
     }
 
-    // Replace configuration placeholders
-    html = html.replace('{{dongleIP}}', config.dongleIP || '')
-               .replace('{{homeAssistantIP}}', config.homeAssistantIP || '')
-               .replace('{{config.sendHaNo}}', selectHaNo)
-               .replace('{{config.sendHaNo}}', selectHaYes)
-               .replace('{{selectNo}}', selectLuxNo)
-               .replace('{{selectNo}}', selectLuxYes)
+    // Update placeholder replacement logic
+    html = html.replace(/{{dongleIP}}/g, config.dongleIP || '')
+               .replace(/{{homeAssistantIP}}/g, config.homeAssistantIP || '')
+               .replace(/{{config.sendHaNo}}/g, !config.sendToHomeAssistant ? 'selected' : '')
+               .replace(/{{config.sendHaYes}}/g, config.sendToHomeAssistant ? 'selected' : '')
+               .replace(/{{selectNo}}/g, !config.sendToLUX ? 'selected' : '')
+               .replace(/{{selectYes}}/g, config.sendToLUX ? 'selected' : '');
 
-    // Generate HTML for packets
+    // Dynamically load packet data
     const sentPacketsHtml = sentPackets.slice(-20).map(packet => 
       `<p>Timestamp: ${packet.timestamp}, Direction: ${packet.direction}, Data: ${packet.data}</p>`
     ).join('');
@@ -288,11 +288,8 @@ app.get('/', (req, res) => {
       `<p>Timestamp: ${packet.timestamp}, Direction: ${packet.direction}, Data: ${packet.data}</p>`
     ).join('');
 
-    // Inject packet data into HTML
     html = html.replace('<!-- Dynamically load last 20 sent packets -->', sentPacketsHtml)
                .replace('<!-- Dynamically load last 20 received packets -->', receivedPacketsHtml);
-      
-    console.log(html); // Add this line before res.send(html);
 
     res.send(html);
   });
