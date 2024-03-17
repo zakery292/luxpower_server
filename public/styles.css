@@ -1,6 +1,21 @@
 body { font-family: Arial, sans-serif; }
 .container { display: flex; }
 .column { padding: 20px; }
-.config, .packets { width: 33%; }
-.packets { overflow-y: auto; height: 400px; }
+.config {
+  width: 25%; /* Reduce the width of the config column */
+  display: flex;
+  flex-direction: column;
+}
+.config label {
+  margin-bottom: 5px; /* Add some space below the label */
+}
+.config input,
+.config select {
+  margin-bottom: 10px; /* Add some space below the input/select */
+}
+.packets {
+  width: 37.5%; /* Increase the width of the packets columns */
+  overflow-y: auto;
+  height: 400px;
+}
 .packets h3 { margin-top: 0; }
