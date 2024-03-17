@@ -1,7 +1,7 @@
 FROM node:14
 
 # Create app directory
-WORKDIR /opt/
+WORKDIR /usr/src/app/
 # Install app dependencies
 COPY package*.json ./
 RUN npm install
@@ -13,9 +13,9 @@ RUN npm install express
 COPY run.sh index.html app.js config.json ./
 
 # Ensure run.sh is executable
-RUN chmod +x ./run.sh
+RUN chmod +x /usr/src/app/run.sh
 
 EXPOSE 3000 4346
 
 # Execute run.sh when the container starts
-CMD [ "/opt/run.sh" ]
+CMD [ "./run.sh" ]
