@@ -1,5 +1,5 @@
 name: Nodejs Server
-version: "1.59"
+version: "1.60"
 slug: nodejs_for_ha
 description: "A TCP server that integrates with Home Assistant"
 url: "https://github.com/zakery292/homeassistant_nodjs"
