@@ -299,12 +299,17 @@ app.get('/', (req, res) => {
 function loadConfig() {
   try {
     const data = fs.readFileSync(CONFIG_FILE, 'utf8');
-    config = JSON.parse(data);
-    console.log('Configuration loaded:', config);
+    if (data) {
+      config = JSON.parse(data);
+      console.log('Configuration loaded:', config);
+    } else {
+      console.log('Configuration file is empty. Using default configuration.');
+    }
   } catch (err) {
-    console.log('No existing configuration found, using defaults.');
+    console.log('Error loading configuration. Using default configuration:', err);
   }
 }
+
 
 app.listen(HTTP_PORT, '0.0.0.0', () => {
     console.log(`Configuration server running at http://localhost:${HTTP_PORT}`);
