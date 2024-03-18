@@ -121,3 +121,33 @@ body {
 }
 
 
+/* Container for status columns */
+.status-container {
+  display: flex; /* Aligns the child elements horizontally */
+  justify-content: space-between; /* Distributes space between the child elements */
+  margin-top: 20px; /* Adds space above the status container */
+  border-top: 2px solid #ddd; /* Adds a top border separating this section from the above content */
+  padding-top: 20px; /* Adds padding at the top inside the container */
+}
+
+/* Common styles for each status column */
+.status-column {
+  flex: 1; /* Allows each column to grow equally */
+  padding: 0 10px; /* Adds padding on the left and right */
+  border-right: 2px solid #ddd; /* Adds a right border to each column */
+}
+
+/* Removes the right border for the last status column */
+.status-column:last-child {
+  border-right: none;
+}
+
+/* Styles for the uptime monitor text */
+.uptime-text {
+  /* Add any specific styles for the uptime text here */
+}
+
+/* Styles for the drop rate text */
+.drop-rate-text {
+  /* Add any specific styles for the drop rate text here */
+}

@@ -158,10 +158,13 @@ function updatePackets() {
     })
     .catch(error => console.error('Error fetching received packets:', error));
 }
-
+function updateData() {
+  updatePackets();
+  updateConnectionStatus();
+}
   document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('configurationForm');
-    let refreshIntervalId = setInterval(updatePackets, 5000); // Initialize with default refresh rate
+    let refreshIntervalId = setInterval(updateData, 5000); // Initialize with default refresh rate
 
     form.onsubmit = function(event) {
       event.preventDefault();
@@ -180,7 +183,7 @@ function updatePackets() {
           alert('Configuration saved successfully.');
           const refreshRate = parseInt(document.getElementById('refreshRate').value, 10) * 1000;
           clearInterval(refreshIntervalId);
-          refreshIntervalId = setInterval(updatePackets, refreshRate); // Update the interval with the new rate
+          refreshIntervalId = setInterval(updateData, refreshRate); // Update the interval with the new rate for both packets and connection status
         } else {
           alert('Error saving configuration');
         }
@@ -192,7 +195,7 @@ function updatePackets() {
     };
 
     // Initial update on page load
-    updatePackets();
+    updateData();
   });
 </script>
 
