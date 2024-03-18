@@ -58,10 +58,34 @@
     </div>
   </div>
 </div>
+<div class="column connection-status">
+  <h3>Connection Status</h3>
+  <div id="dongleStatus">Dongle: <span class="status-dot" id="dongleStatusDot"></span></div>
+  <div id="luxStatus">LUX: <span class="status-dot" id="luxStatusDot"></span></div>
+  <div id="haStatus">Home Assistant: <span class="status-dot" id="haStatusDot"></span></div>
+</div>
 <script>
   // Variables to keep track of the last known packet timestamps
 let lastSentPacketTimestamp = "";
 let lastReceivedPacketTimestamp = "";
+
+function updateConnectionStatus() {
+  fetch('/api/connection-status')
+    .then(response => response.json())
+    .then(data => {
+      // Update the connection status in the web portal
+      // For example, change the color of the status dot based on the connection status
+      document.getElementById('dongleStatusDot').className = data.Dongle.connected ? 'status-dot connected' : 'status-dot disconnected';
+      document.getElementById('luxStatusDot').className = data.LUX.connected ? 'status-dot connected' : 'status-dot disconnected';
+      document.getElementById('haStatusDot').className = data.HomeAssistant.connected ? 'status-dot connected' : 'status-dot disconnected';
+    })
+    .catch(error => console.error('Error fetching connection status:', error));
+}
+
+// Update connection status every 5 seconds, or use the same interval as packet updates
+setInterval(updateConnectionStatus, 5000);
+
+
 
 function updatePackets() {
   // Fetch and update sent packets

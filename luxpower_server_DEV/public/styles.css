@@ -103,3 +103,19 @@ body {
   }
 }
 
+
+.status-dot {
+  height: 10px;
+  width: 10px;
+  background-color: #bbb;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.connected {
+  background-color: #4CAF50;
+}
+
+.disconnected {
+  background-color: #f44336;
+}

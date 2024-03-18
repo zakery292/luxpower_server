@@ -15,6 +15,45 @@ app.use(express.static(path.join(__dirname, 'public')));
 const LUX_IP = '8.208.83.249'; // LUX IP address
 const LUX_PORT = 4346; // Assuming LUX listens on the same port
 
+let connectionStatus = {
+  Dongle: { connected: false, lastConnected: null, disconnections: 0 },
+  LUX: { connected: false, lastConnected: null, disconnections: 0 },
+  HomeAssistant: { connected: false, lastConnected: null, disconnections: 0 },
+};
+
+// Dongle Connections and disconnections
+connectionStatus.Dongle.connected = true;
+connectionStatus.Dongle.lastConnected = new Date();
+
+// And when it disconnects:
+connectionStatus.Dongle.connected = false;
+connectionStatus.Dongle.disconnections += 1;
+
+//LUX connections and disconnections
+// Update these objects when connections are established or lost
+
+connectionStatus.Lux.connected = true;
+connectionStatus.Lux.lastConnected = new Date();
+
+// And when it disconnects:
+connectionStatus.Lux.connected = false;
+connectionStatus.Lux.disconnections += 1;
+
+//Home Assistant Connections and disconnections
+connectionStatus.homeAssistant.connected = true;
+connectionStatus.homeAssistant.lastConnected = new Date();
+
+// And when it disconnects:
+connectionStatus.homeAssistant.connected = false;
+connectionStatus.homeAssistant.disconnections += 1;
+
+// Create an endpoint to send this data to the frontend
+app.get('/api/connection-status', (req, res) => {
+  res.json(connectionStatus);
+});
+
+
+
 let config = {
     dongleIP: null,
     homeAssistantIP: null,
