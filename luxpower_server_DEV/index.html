@@ -70,7 +70,7 @@ let lastSentPacketTimestamp = "";
 let lastReceivedPacketTimestamp = "";
 
 function updateConnectionStatus() {
-  fetch('/api/connection-status')
+  fetch('api/connection-status')
     .then(response => response.json())
     .then(data => {
       // Update the connection status in the web portal
