@@ -401,6 +401,8 @@ app.get('/api/connection-status', (req, res) => {
     } else {
       connectionStatus[key].uptime = 0;
     }
+    // Add disconnection count to the response
+    connectionStatus[key].disconnections = connectionStatus[key].disconnections;
   });
 
   res.json(connectionStatus);

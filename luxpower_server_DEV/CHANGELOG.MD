@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added Ensured the data in the new columns persists on web page restart 
 - Added who sent what data in the packet frames on the webpage 
 - CSS Stylining everyline is now commented so its easier to adjust CSS when making amendments
+- Dropped connections added 
+- Uptime Added 
+- Connection status added
 
 ## fixed
 - Disconnection and reconnection of LUX server connection at any point not just on server start

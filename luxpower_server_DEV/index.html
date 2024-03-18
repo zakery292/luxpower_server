@@ -73,9 +73,9 @@
   </div>
   <div class="status-column">
     <h3>Droped Rate (connections)</h3>
-    <div id="dongledroprate">Dongle: <span class="status-dot" id="dongleStatusDot"></span></div>
-    <div id="luxdroprate">LUX: <span class="status-dot" id="luxStatusDot"></span></div>
-    <div id="hadroprate">Home Assistant: <span class="status-dot" id="haStatusDot"></span></div>
+    <div id="dongledroprate">Dongle: <span id="dongleDisconnects"></span></div>
+    <div id="luxdroprate">LUX: <span id="luxDisconnects"></span></div>
+    <div id="hadroprate">Home Assistant: <span id="haDisconnects"></span></div>
   </div>
 </div>
 <script>
@@ -87,14 +87,20 @@ function updateConnectionStatus() {
   fetch('api/connection-status')
     .then(response => response.json())
     .then(data => {
+      // Update status dots
       document.getElementById('dongleStatusDot').className = data.Dongle.connected ? 'status-dot connected' : 'status-dot disconnected';
       document.getElementById('luxStatusDot').className = data.LUX.connected ? 'status-dot connected' : 'status-dot disconnected';
       document.getElementById('haStatusDot').className = data.HomeAssistant.connected ? 'status-dot connected' : 'status-dot disconnected';
 
-      // Format and display the uptime
+      // Update uptime
       document.getElementById('dongleUptime').textContent = formatUptime(data.Dongle.uptime);
       document.getElementById('luxUptime').textContent = formatUptime(data.LUX.uptime);
       document.getElementById('haUptime').textContent = formatUptime(data.HomeAssistant.uptime);
+
+      // Update disconnections
+      document.getElementById('dongledroprate').textContent = `Dongle: ${data.Dongle.disconnections}`;
+      document.getElementById('luxdroprate').textContent = `LUX: ${data.LUX.disconnections}`;
+      document.getElementById('hadroprate').textContent = `Home Assistant: ${data.HomeAssistant.disconnections}`;
     })
     .catch(error => console.error('Error fetching connection status:', error));
 }
