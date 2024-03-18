@@ -1,4 +1,4 @@
-name: Luxpower Dongle Server
+name: Luxpower Dongle Server Dev
 version: "2.14"
 slug: luxpower_server_dev
 description: "Dongle Server to connect to BH/BG Dongles to enable access into HA Via Luxpython. This server will only work with extral equipment purchased seperatly"
