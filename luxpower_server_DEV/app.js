@@ -129,6 +129,8 @@ function connectToLUX() {
       luxSocket = new net.Socket();
       luxSocket.connect(LUX_PORT, LUX_IP, () => {
         console.log('Connected to LUX');
+        connectionStatus.LUX.connected = true;
+        connectionStatus.LUX.lastConnected = new Date();
       });
 
       luxSocket.on('data', (data) => {
@@ -141,6 +143,8 @@ function connectToLUX() {
       luxSocket.on('close', () => {
         console.log('Connection to LUX closed');
         luxSocket = null;
+        connectionStatus.LUX.connected = false;
+        connectionStatus.LUX.disconnections += 1;
       });
 
       luxSocket.on('error', (err) => {
@@ -154,6 +158,8 @@ function connectToLUX() {
       luxSocket.destroy();
       luxSocket = null;
       console.log('Disconnected from LUX');
+      connectionStatus.LUX.connected = false;
+      connectionStatus.LUX.disconnections += 1;
     }
   }
 }
@@ -167,11 +173,15 @@ const tcpServer = net.createServer((socket) => {
   if (remoteAddress === getNormalizedAddress(config.dongleIP)) {
     console.log('Dongle connected');
     dongleSocket = socket;
+    connectionStatus.Dongle.connected = true;
+    connectionStatus.Dongle.lastConnected = new Date();
   }
   // Check if the connected client is Home Assistant
   else if (remoteAddress === getNormalizedAddress(config.homeAssistantIP)) {
     console.log('Home Assistant connected');
     homeAssistantSocket = socket;
+    connectionStatus.HomeAssistant.connected = true;
+    connectionStatus.HomeAssistant.lastConnected = new Date();
   }
 
   socket.on('data', (data) => {
@@ -184,12 +194,18 @@ const tcpServer = net.createServer((socket) => {
     if (socket === dongleSocket) {
       console.log('Dongle socket closed');
       dongleSocket = null;
+      connectionStatus.Dongle.connected = false;
+      connectionStatus.Dongle.disconnections += 1;
     } else if (socket === homeAssistantSocket) {
       console.log('Home Assistant socket closed');
       homeAssistantSocket = null;
+      connectionStatus.HomeAssistant.connected = false;
+      connectionStatus.HomeAssistant.disconnections += 1;
     } else if (socket === luxSocket) {
       console.log('LUX socket closed');
       luxSocket = null;
+      connectionStatus.LUX.connected = false;
+      connectionStatus.LUX.disconnections += 1;
     }
   });
 
