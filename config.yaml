@@ -1,5 +1,5 @@
 name: Luxpower Dongle Server
-version: "2.01"
+version: "2.02"
 slug: nodejs_for_ha
 description: "Dongle Server to connect to BH/BG Dongles to enable access into HA Via Luxpython. This server will only work with extral equipment purchased seperatly"
 url: "https://github.com/zakery292/homeassistant_nodjs"
