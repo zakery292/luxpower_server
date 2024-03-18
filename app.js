@@ -88,40 +88,38 @@ function getNormalizedAddress(address) {
 
 
 function connectToLUX() {
-  if (!config.sendToLUX || luxSocket) {
-    return;
-  }
+  if (config.sendToLUX) {
+    if (!luxSocket || luxSocket.destroyed) {
+      luxSocket = new net.Socket();
+      luxSocket.connect(LUX_PORT, LUX_IP, () => {
+        console.log('Connected to LUX');
+      });
 
-  luxSocket = new net.Socket();
+      luxSocket.on('data', (data) => {
+        if (dongleSocket) {
+          dongleSocket.write(data);
+          console.log(`Received data from LUX and forwarded to Dongle: ${data.toString('hex')}`);
+        }
+      });
 
-  luxSocket.connect(LUX_PORT, LUX_IP, () => {
-    console.log('Connected to LUX');
-  });
+      luxSocket.on('close', () => {
+        console.log('Connection to LUX closed');
+        luxSocket = null;
+      });
 
-  luxSocket.on('data', (data) => {
-    if (dongleSocket) {
-      dongleSocket.write(data);
-      console.log(`Received data from LUX and forwarded to Dongle: ${data.toString('hex')}`);
+      luxSocket.on('error', (err) => {
+        console.error('Connection to LUX error:', err);
+        luxSocket.destroy();
+        luxSocket = null;
+      });
     }
-  });
-
-  // Adjust the 'close' event handler
-  luxSocket.on('close', () => {
-    console.log('Connection to LUX closed');
-    // Check if the closure was intentional (config changed or dongle disconnected)
-    if (config.sendToLUX) {
-      console.log('Attempting to reconnect to LUX...');
-      connectToLUX();
-    } else {
+  } else {
+    if (luxSocket && !luxSocket.destroyed) {
+      luxSocket.destroy();
       luxSocket = null;
+      console.log('Disconnected from LUX');
     }
-  });
-
-  luxSocket.on('error', (err) => {
-    console.error('Connection to LUX error:', err);
-    luxSocket.destroy();
-    luxSocket = null;
-  });
+  }
 }
 
 
@@ -252,23 +250,26 @@ function handleIncomingData(socket, data) {
 }
 
 
-// Update your /configure endpoint to handle sendToHomeAssistant
+
 app.post('/configure', (req, res) => {
-    console.log('Received configuration:', req.body);
-    const prevSendToLUX = config.sendToLUX;
-    config.dongleIP = req.body.dongleIP;
-    config.homeAssistantIP = req.body.homeAssistantIP;
-    config.sendToLUX = req.body.sendToLUX === 'yes';
-    config.sendToHomeAssistant = req.body.sendToHomeAssistant === 'yes'; // Add this line
+  console.log('Received configuration:', req.body);
   
-    console.log('Configuration updated:', config);
-    saveConfig();
-    
+  config.dongleIP = req.body.dongleIP;
+  config.homeAssistantIP = req.body.homeAssistantIP;
+  const prevSendToLUX = config.sendToLUX;
+  config.sendToLUX = req.body.sendToLUX === 'yes';
+  config.sendToHomeAssistant = req.body.sendToHomeAssistant === 'yes';
   
-    // LUX reconnection logic remains the same
-  
-    res.send('Configuration updated successfully');
-  });
+  saveConfig();
+  console.log('Configuration updated:', config);
+
+  // Check if the LUX connection state should change
+  if (prevSendToLUX !== config.sendToLUX) {
+    connectToLUX();
+  }
+
+  res.send('Configuration updated successfully');
+});
 app.get('/', (req, res) => {
   fs.readFile('index.html', 'utf8', (err, html) => {
     if (err) {
