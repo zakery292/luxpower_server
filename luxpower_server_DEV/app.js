@@ -14,12 +14,45 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const LUX_IP = '8.208.83.249'; // LUX IP address
 const LUX_PORT = 4346; // Assuming LUX listens on the same port
+const CONNECTION_STATUS_FILE = '/data/connectionStatus.json';
 
 let connectionStatus = {
   Dongle: { connected: false, lastConnected: null, disconnections: 0 },
   LUX: { connected: false, lastConnected: null, disconnections: 0 },
   HomeAssistant: { connected: false, lastConnected: null, disconnections: 0 },
 };
+
+function loadConnectionStatus() {
+  try {
+    if (fs.existsSync(CONNECTION_STATUS_FILE)) {
+      const data = fs.readFileSync(CONNECTION_STATUS_FILE, 'utf8');
+      connectionStatus = JSON.parse(data);
+    } else {
+      // Initialize with default values if the file doesn't exist
+      resetConnectionStatus();
+    }
+  } catch (err) {
+    console.error('Error loading connection status:', err);
+    resetConnectionStatus();
+  }
+}
+
+function resetConnectionStatus() {
+  connectionStatus = {
+    Dongle: { connected: false, lastConnected: null, disconnections: 0 },
+    LUX: { connected: false, lastConnected: null, disconnections: 0 },
+    HomeAssistant: { connected: false, lastConnected: null, disconnections: 0 },
+  };
+  saveConnectionStatus();  // Save the reset status
+}
+
+
+function saveConnectionStatus() {
+  fs.writeFile(CONNECTION_STATUS_FILE, JSON.stringify(connectionStatus, null, 2), (err) => {
+    if (err) console.error('Failed to save connection status:', err);
+    else console.log('Connection status saved successfully.');
+  });
+}
 
 // Dongle Connections and disconnections
 connectionStatus.Dongle.connected = true;
@@ -131,6 +164,7 @@ function connectToLUX() {
         console.log('Connected to LUX');
         connectionStatus.LUX.connected = true;
         connectionStatus.LUX.lastConnected = new Date();
+        saveConnectionStatus();
       });
 
       luxSocket.on('data', (data) => {
@@ -145,6 +179,7 @@ function connectToLUX() {
         luxSocket = null;
         connectionStatus.LUX.connected = false;
         connectionStatus.LUX.disconnections += 1;
+        saveConnectionStatus();
       });
 
       luxSocket.on('error', (err) => {
@@ -160,6 +195,7 @@ function connectToLUX() {
       console.log('Disconnected from LUX');
       connectionStatus.LUX.connected = false;
       connectionStatus.LUX.disconnections += 1;
+      saveConnectionStatus();
     }
   }
 }
@@ -175,6 +211,7 @@ const tcpServer = net.createServer((socket) => {
     dongleSocket = socket;
     connectionStatus.Dongle.connected = true;
     connectionStatus.Dongle.lastConnected = new Date();
+    saveConnectionStatus();
   }
   // Check if the connected client is Home Assistant
   else if (remoteAddress === getNormalizedAddress(config.homeAssistantIP)) {
@@ -182,6 +219,7 @@ const tcpServer = net.createServer((socket) => {
     homeAssistantSocket = socket;
     connectionStatus.HomeAssistant.connected = true;
     connectionStatus.HomeAssistant.lastConnected = new Date();
+    saveConnectionStatus();
   }
 
   socket.on('data', (data) => {
@@ -196,16 +234,19 @@ const tcpServer = net.createServer((socket) => {
       dongleSocket = null;
       connectionStatus.Dongle.connected = false;
       connectionStatus.Dongle.disconnections += 1;
+      saveConnectionStatus();
     } else if (socket === homeAssistantSocket) {
       console.log('Home Assistant socket closed');
       homeAssistantSocket = null;
       connectionStatus.HomeAssistant.connected = false;
       connectionStatus.HomeAssistant.disconnections += 1;
+      saveConnectionStatus();
     } else if (socket === luxSocket) {
       console.log('LUX socket closed');
       luxSocket = null;
       connectionStatus.LUX.connected = false;
       connectionStatus.LUX.disconnections += 1;
+      saveConnectionStatus();
     }
   });
 
@@ -343,9 +384,15 @@ app.get('/', (req, res) => {
 });
 
 
-// Create an endpoint to send this data to the frontend
 app.get('/api/connection-status', (req, res) => {
-  res.json(connectionStatus);
+  fs.readFile(CONNECTION_STATUS_FILE, 'utf8', (err, data) => {
+    if (err) {
+      console.error('Error reading connection status file:', err);
+      res.status(500).send('Error loading connection status');
+    } else {
+      res.json(JSON.parse(data));
+    }
+  });
 });
 
 // Endpoint to get the last 20 sent packets
