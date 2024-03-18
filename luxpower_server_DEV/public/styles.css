@@ -1,0 +1,105 @@
+/* Global styles */
+body {
+  font-family: Arial, sans-serif; /* Sets the default font for the entire page to Arial */
+  margin: 0; /* Removes the default margin around the <body> element */
+  padding: 0; /* Removes the default padding around the <body> element */
+  background: #f4f4f4; /* Sets a light grey background color for the entire page */
+}
+
+/* Container for the entire page content */
+.container {
+  display: flex; /* Enables a flexbox layout for direct children, allowing for responsive layouts */
+  padding: 20px; /* Adds 20 pixels of padding inside the container, creating space between the container's border and its content */
+}
+
+/* Heading for the page */
+.main-heading {
+  text-align: center; /* Centers the heading text horizontally */
+  font-size: 1.4em; /* Sets the font size to 1.4 times the size of the surrounding text */
+  border-bottom: 2px solid #ddd; /* Creates a solid grey line under the heading */
+  margin-bottom: 20px; /* Adds 20 pixels of space below the heading */
+  padding-bottom: 5px; /* Adds 5 pixels of space above the heading's underline */
+  margin-left: 20px; /* Extends the underline 20 pixels beyond the text to the left */
+  margin-right: 20px; /* Extends the underline 20 pixels beyond the text to the right */
+}
+
+/* Common styles for each column (configuration and packets) */
+.column {
+  padding: 20px; /* Adds padding inside each column to create space between the column's border and its content */
+}
+
+/* Styles for the configuration column */
+.config {
+  flex: 0 0 15%; /* The column will not grow to fit extra space and will have a base width of 20% */
+  flex-direction: column; /* Stacks the children elements vertically */
+  border-right: 2px solid #ddd; /* Adds a solid grey border to the right side of the configuration column */
+  padding-right: 5px; /* Adds padding to the right side inside the configuration column */
+}
+
+/* Styles for the Server Configuration heading */
+.config h2 {
+  font-size: 1.2em; /* Sets the font size to 1.2 times the size of the surrounding text, making it slightly smaller than the main heading */
+  margin-top: 0; /* Removes the top margin to keep the heading close to the top of the column */
+}
+
+/* Styles for labels in the configuration form */
+.config label {
+  margin-bottom: 5px; /* Adds space below each label */
+  font-size: 14px; /* Sets the font size for labels */
+}
+
+/* Adjusts the styling for inputs and buttons */
+.config input[type="text"],
+.config select,
+.config input[type="submit"] {
+  width: 100%; /* Makes inputs and buttons take the full width of their parent */
+  box-sizing: border-box; /* Includes padding and border in the element's total width and height */
+  margin-bottom: 10px; /* Adds space below each input and button */
+  cursor: pointer; /* Indicates a clickable button area */
+}
+
+/* Sent and Received Packets columns */
+.packets {
+  flex: 1; /* Takes up the remaining space in the flex container */
+  overflow-y: auto; /* Allows vertical scrolling if the content is taller than the element */
+  height: 400px; /* Sets a fixed height for the packet columns */
+  margin-left: 20px; /* Adds space to the left side of the packet columns */
+  border-right: 2px solid #ddd; /* Adds a solid grey border to the right side of the packet columns */
+}
+/* Reduces the font size for the packet data and ensures wrapping */
+.packets p {
+  font-size: 12px; /* Sets a smaller font size for the packet data */
+  white-space: normal; /* Allows the text to wrap to the next line */
+  word-break: break-word; /* Ensures that long words will break and wrap to the next line */
+}
+
+/* Styles for the headings in the packets columns */
+.packets h3 {
+  margin-top: 0; /* Removes the top margin from the packet headings */
+}
+
+/* Ensure labels are displayed as block elements (on their own line) */
+.form-group label {
+  display: block; /* Forces labels to have their own line */
+}
+
+/* Ensure inputs and selects are displayed as block elements (on their own line) */
+.form-group input,
+.form-group select {
+  display: block; /* Forces inputs and selects to have their own line */
+}
+
+
+.highlight {
+  animation: highlightAnimation 1s;
+}
+
+@keyframes highlightAnimation {
+  from {
+    background-color: yellow;
+  }
+  to {
+    background-color: transparent;
+  }
+}
+

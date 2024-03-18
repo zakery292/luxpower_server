@@ -1,0 +1,12 @@
+{
+    "name": "nodejs-for-ha",
+    "version": "1.03",
+    "description": "A TCP server that integrates with Home Assistant",
+    "main": "app.js",
+    "scripts": {
+      "start": "node app.js"
+    },
+    "dependencies": {
+      "express": "^4.17.1"
+    }
+  }
