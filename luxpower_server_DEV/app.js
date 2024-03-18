@@ -32,20 +32,20 @@ connectionStatus.Dongle.disconnections += 1;
 //LUX connections and disconnections
 // Update these objects when connections are established or lost
 
-connectionStatus.Lux.connected = true;
-connectionStatus.Lux.lastConnected = new Date();
+connectionStatus.LUX.connected = true;
+connectionStatus.LUX.lastConnected = new Date();
 
 // And when it disconnects:
-connectionStatus.Lux.connected = false;
-connectionStatus.Lux.disconnections += 1;
+connectionStatus.LUX.connected = false;
+connectionStatus.LUX.disconnections += 1;
 
 //Home Assistant Connections and disconnections
-connectionStatus.homeAssistant.connected = true;
-connectionStatus.homeAssistant.lastConnected = new Date();
+connectionStatus.HomeAssistant.connected = true;
+connectionStatus.HomeAssistant.lastConnected = new Date();
 
 // And when it disconnects:
-connectionStatus.homeAssistant.connected = false;
-connectionStatus.homeAssistant.disconnections += 1;
+connectionStatus.HomeAssistant.connected = false;
+connectionStatus.HomeAssistant.disconnections += 1;
 
 // Create an endpoint to send this data to the frontend
 app.get('/api/connection-status', (req, res) => {
