@@ -47,10 +47,7 @@ connectionStatus.HomeAssistant.lastConnected = new Date();
 connectionStatus.HomeAssistant.connected = false;
 connectionStatus.HomeAssistant.disconnections += 1;
 
-// Create an endpoint to send this data to the frontend
-app.get('/api/connection-status', (req, res) => {
-  res.json(connectionStatus);
-});
+
 
 
 
@@ -329,6 +326,11 @@ app.get('/', (req, res) => {
   });
 });
 
+
+// Create an endpoint to send this data to the frontend
+app.get('/api/connection-status', (req, res) => {
+  res.json(connectionStatus);
+});
 
 // Endpoint to get the last 20 sent packets
 app.get('/api/sent-packets', (req, res) => {
