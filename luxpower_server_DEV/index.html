@@ -58,23 +58,25 @@
     </div>
   </div>
 </div>
-<div class="column connection-status">
-  <h3>Connection Status</h3>
-  <div id="dongleStatus">Dongle: <span class="status-dot" id="dongleStatusDot"></span></div>
-  <div id="luxStatus">LUX: <span class="status-dot" id="luxStatusDot"></span></div>
-  <div id="haStatus">Home Assistant: <span class="status-dot" id="haStatusDot"></span></div>
-</div>
-<div class="column connection-uptime">
-  <h3>Uptime Monitor</h3>
-  <div id="dongleuptime">Dongle: <span id="dongleUptime"></span></div>
-  <div id="luxuptime">LUX: <span id="luxUptime"></span></div>
-  <div id="hauptime">Home Assistant: <span id="haUptime"></span></div>
-</div>
-<div class="column connection-droprate">
-  <h3>Droped Rate (connections)</h3>
-  <div id="dongledroprate">Dongle: <span class="status-dot" id="dongleStatusDot"></span></div>
-  <div id="luxdroprate">LUX: <span class="status-dot" id="luxStatusDot"></span></div>
-  <div id="hadroprate">Home Assistant: <span class="status-dot" id="haStatusDot"></span></div>
+<div class="status-container">
+  <div class="status-column">
+    <h3>Connection Status</h3>
+    <div id="dongleStatus">Dongle: <span class="status-dot" id="dongleStatusDot"></span></div>
+    <div id="luxStatus">LUX: <span class="status-dot" id="luxStatusDot"></span></div>
+    <div id="haStatus">Home Assistant: <span class="status-dot" id="haStatusDot"></span></div>
+  </div>
+  <div class="status-column">
+    <h3>Uptime Monitor</h3>
+    <div id="dongleuptime">Dongle: <span id="dongleUptime"></span></div>
+    <div id="luxuptime">LUX: <span id="luxUptime"></span></div>
+    <div id="hauptime">Home Assistant: <span id="haUptime"></span></div>
+  </div>
+  <div class="status-column">
+    <h3>Droped Rate (connections)</h3>
+    <div id="dongledroprate">Dongle: <span class="status-dot" id="dongleStatusDot"></span></div>
+    <div id="luxdroprate">LUX: <span class="status-dot" id="luxStatusDot"></span></div>
+    <div id="hadroprate">Home Assistant: <span class="status-dot" id="haStatusDot"></span></div>
+  </div>
 </div>
 <script>
   // Variables to keep track of the last known packet timestamps
