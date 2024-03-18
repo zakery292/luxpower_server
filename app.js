@@ -175,6 +175,7 @@ tcpServer.listen(TCP_PORT, () => {
 function handleIncomingData(socket, data) {
   const remoteAddress = getNormalizedAddress(socket.remoteAddress);
   let source = 'Unknown';
+  let destinations = [];
 
   const normalizedDongleIP = getNormalizedAddress(config.dongleIP);
   const normalizedHomeAssistantIP = getNormalizedAddress(config.homeAssistantIP);
@@ -182,15 +183,15 @@ function handleIncomingData(socket, data) {
 
   if (remoteAddress === normalizedDongleIP) {
     source = 'Dongle';
-    logPacket(receivedPackets, data, false, source);
+    logPacket(receivedPackets, data, false, source); // Log received data from the dongle
   } else if (remoteAddress === normalizedHomeAssistantIP) {
     source = 'Home Assistant';
-    logPacket(sentPackets, data, true, source);
+    logPacket(sentPackets, data, true, source); // Log data sent to Home Assistant
   } else if (remoteAddress === normalizedLUX_IP) {
     source = 'LUX';
-    logPacket(sentPackets, data, true, source);
+    logPacket(sentPackets, data, true, source); // Log data sent to LUX
   }
-  
+
   console.log(`${source} sent data: ${data.toString('hex')}`);
 
   // Handling data from Dongle
