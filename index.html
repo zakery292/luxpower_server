@@ -95,7 +95,7 @@ function updatePackets() {
       data.reverse().forEach(packet => {
         if (!lastReceivedPacketTimestamp || packet.timestamp > lastReceivedPacketTimestamp) {
           const packetElement = document.createElement('p');
-          packetElement.textContent = `Timestamp: ${packet.timestamp}, Direction: ${packet.direction}, Data: ${packet.data}`;
+          packetElement.textContent = `Source: ${packet.source}, Timestamp: ${packet.timestamp}, Direction: ${packet.direction}, Data: ${packet.data}`;
           packetElement.classList.add('highlight');
           receivedPacketsDiv.insertBefore(packetElement, receivedPacketsDiv.firstChild);
           newPacketFound = true;
