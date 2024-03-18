@@ -392,25 +392,20 @@ app.get('/', (req, res) => {
 });
 
 app.get('/api/connection-status', (req, res) => {
-  fs.readFile(CONNECTION_STATUS_FILE, 'utf8', (err, data) => {
-    if (err) {
-      console.error('Error reading connection status file:', err);
-      res.status(500).send('Error loading connection status');
+  const now = new Date();
+  
+  Object.keys(connectionStatus).forEach((key) => {
+    if (connectionStatus[key].connected && connectionStatus[key].lastConnected) {
+      const lastConnected = new Date(connectionStatus[key].lastConnected);
+      connectionStatus[key].uptime = Math.floor((now - lastConnected) / 1000);  // uptime in seconds
     } else {
-      const status = JSON.parse(data);
-      Object.keys(status).forEach(key => {
-        if (status[key].connected && status[key].uptimeStart) {
-          const now = new Date();
-          const uptimeStart = new Date(status[key].uptimeStart);
-          status[key].uptime = Math.floor((now - uptimeStart) / 1000); // uptime in seconds
-        } else {
-          status[key].uptime = 0;
-        }
-      });
-      res.json(status);
+      connectionStatus[key].uptime = 0;
     }
   });
+
+  res.json(connectionStatus);
 });
+
 
 // Endpoint to get the last 20 sent packets
 app.get('/api/sent-packets', (req, res) => {
