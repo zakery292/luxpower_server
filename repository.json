@@ -1,6 +1,4 @@
-{
+name: Luxpower Nodejs
+url: 'https://github.com/zakery292/luxpower_server'
+maintainer: Zakery292 <zak.hurst@sky.com>
 
-  "name": "Luxpower Nodejs",
-  "url": "https://github.com/zakery292/luxpower_server",
-  "maintainer": "Zakery292 <zak.hurst@sky.com>",
-}
