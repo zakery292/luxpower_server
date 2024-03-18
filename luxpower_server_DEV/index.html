@@ -97,13 +97,16 @@ function updateConnectionStatus() {
     .catch(error => console.error('Error fetching connection status:', error));
 }
 
+
 // Convert seconds to DD-HH-MM-SS format
 function formatUptime(uptime) {
-  const seconds = uptime % 60;
-  const minutes = Math.floor(uptime / 60) % 60;
-  const hours = Math.floor(uptime / 3600) % 24;
-  const days = Math.floor(uptime / 86400);
-  return `${days}d ${hours}h ${minutes}m ${seconds}s`;
+    if (isNaN(uptime)) return "0d 0h 0m 0s"; // Check for NaN
+
+    const seconds = uptime % 60;
+    const minutes = Math.floor(uptime / 60) % 60;
+    const hours = Math.floor(uptime / 3600) % 24;
+    const days = Math.floor(uptime / 86400);
+    return `${days}d ${hours}h ${minutes}m ${seconds}s`;
 }
 
 setInterval(updateConnectionStatus, 5000);

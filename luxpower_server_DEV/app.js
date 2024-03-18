@@ -17,9 +17,9 @@ const LUX_PORT = 4346; // Assuming LUX listens on the same port
 const CONNECTION_STATUS_FILE = '/data/connectionStatus.json';
 
 let connectionStatus = {
-  Dongle: { connected: false, lastConnected: null, disconnections: 0 },
-  LUX: { connected: false, lastConnected: null, disconnections: 0 },
-  HomeAssistant: { connected: false, lastConnected: null, disconnections: 0 },
+  Dongle: { connected: false, lastConnected: null, disconnections: 0, uptimeStart: null },
+  LUX: { connected: false, lastConnected: null, disconnections: 0, uptimeStart: null },
+  HomeAssistant: { connected: false, lastConnected: null, disconnections: 0, uptimeStart: null },
 };
 
 function loadConnectionStatus() {
@@ -164,6 +164,7 @@ function connectToLUX() {
         console.log('Connected to LUX');
         connectionStatus.LUX.connected = true;
         connectionStatus.LUX.lastConnected = new Date();
+        connectionStatus.LUX.uptimeStart = new Date(); // Set the uptime start
         saveConnectionStatus();
       });
 
@@ -179,6 +180,7 @@ function connectToLUX() {
         luxSocket = null;
         connectionStatus.LUX.connected = false;
         connectionStatus.LUX.disconnections += 1;
+        connectionStatus.LUX.uptimeStart = null; // Clear the uptime star
         saveConnectionStatus();
       });
 
@@ -195,6 +197,7 @@ function connectToLUX() {
       console.log('Disconnected from LUX');
       connectionStatus.LUX.connected = false;
       connectionStatus.LUX.disconnections += 1;
+      connectionStatus.LUX.uptimeStart = null; // Clear the uptime star
       saveConnectionStatus();
     }
   }
@@ -211,6 +214,7 @@ const tcpServer = net.createServer((socket) => {
     dongleSocket = socket;
     connectionStatus.Dongle.connected = true;
     connectionStatus.Dongle.lastConnected = new Date();
+    connectionStatus.Dongle.uptimeStart = new Date();
     saveConnectionStatus();
   }
   // Check if the connected client is Home Assistant
@@ -219,6 +223,7 @@ const tcpServer = net.createServer((socket) => {
     homeAssistantSocket = socket;
     connectionStatus.HomeAssistant.connected = true;
     connectionStatus.HomeAssistant.lastConnected = new Date();
+    connectionStatus.HomeAssistant.uptimeStart = new Date();
     saveConnectionStatus();
   }
 
@@ -234,18 +239,21 @@ const tcpServer = net.createServer((socket) => {
       dongleSocket = null;
       connectionStatus.Dongle.connected = false;
       connectionStatus.Dongle.disconnections += 1;
+      connectionStatus.Dongle.uptimeStart = null;
       saveConnectionStatus();
     } else if (socket === homeAssistantSocket) {
       console.log('Home Assistant socket closed');
       homeAssistantSocket = null;
       connectionStatus.HomeAssistant.connected = false;
       connectionStatus.HomeAssistant.disconnections += 1;
+      connectionStatus.HomeAssistant.uptimeStart = null;
       saveConnectionStatus();
     } else if (socket === luxSocket) {
       console.log('LUX socket closed');
       luxSocket = null;
       connectionStatus.LUX.connected = false;
       connectionStatus.LUX.disconnections += 1;
+      connectionStatus.LUX.uptimeStart = null;
       saveConnectionStatus();
     }
   });
@@ -383,14 +391,23 @@ app.get('/', (req, res) => {
   });
 });
 
-
 app.get('/api/connection-status', (req, res) => {
   fs.readFile(CONNECTION_STATUS_FILE, 'utf8', (err, data) => {
     if (err) {
       console.error('Error reading connection status file:', err);
       res.status(500).send('Error loading connection status');
     } else {
-      res.json(JSON.parse(data));
+      const status = JSON.parse(data);
+      Object.keys(status).forEach(key => {
+        if (status[key].connected && status[key].uptimeStart) {
+          const now = new Date();
+          const uptimeStart = new Date(status[key].uptimeStart);
+          status[key].uptime = Math.floor((now - uptimeStart) / 1000); // uptime in seconds
+        } else {
+          status[key].uptime = 0;
+        }
+      });
+      res.json(status);
     }
   });
 });
