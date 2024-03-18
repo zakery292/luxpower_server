@@ -128,6 +128,9 @@ const CONFIG_FILE = '/data/config.json';
 
 loadConfig();
 
+
+
+
 function logPacket(packetArray, packet, isSent, source) {
   const packetLog = {
     timestamp: new Date().toLocaleString(),
@@ -287,11 +290,21 @@ function handleIncomingData(socket, data) {
     logPacket(receivedPackets, data, false, source); // Log received data from the dongle
   } else if (remoteAddress === normalizedHomeAssistantIP) {
     source = 'Home Assistant';
+    // If the Home Assistant socket is null but we're receiving data from the Home Assistant IP, update the socket
+    if (!homeAssistantSocket) {
+      console.log('Updating Home Assistant socket reference.');
+      homeAssistantSocket = socket;
+      connectionStatus.HomeAssistant.connected = true; // Also update the connection status
+      saveConnectionStatus();
+    }
     logPacket(sentPackets, data, true, source); // Log data sent to Home Assistant
   } else if (remoteAddress === normalizedLUX_IP) {
     source = 'LUX';
     logPacket(sentPackets, data, true, source); // Log data sent to LUX
   }
+
+
+
 
   console.log(`${source} sent data: ${data.toString('hex')}`);
 

@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## fixed
 - Disconnection and reconnection of LUX server connection at any point not just on server start
 - small bug fixes and code amendments 
+- If the homeassistant socket did not register but we are receiving data then update the socket reference and update the webpage with the new data
 
 ## Changed
 - Serverside logic for packet routing
