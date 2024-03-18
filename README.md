@@ -1,5 +1,10 @@
 # Luxpower Dongle Server
 
+## The is the Devlopment branch of the dongles server. Things will break, things wont work. 
+
+If you are going to follow and use this to stay on the bleeding edge then understand this, i make lots of small commits and sometimes ill get bored and leave it broken. ill update the changelog if and when i break it and plan to come back to it. if the version changes by 0.01 then its a small change if it changes by 0.10 then its a bigger change and things might be broken or fixed but ill update the change log. 
+I strongly suggest you keep well away from this branch we will merge on even numbers from this point 0.10,0.20.0.30 ect. 
+
 ## Description
 
 The Luxpower Dongle Server is designed to interface with BH/BG serial number dongles, providing a secure, local connection to Home Assistant. This solution enhances network security by limiting the data sent externally, ensuring that all information remains within your local network.
