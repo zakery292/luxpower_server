@@ -169,6 +169,12 @@ function connectToLUX() {
         connectionStatus.LUX.lastConnected = new Date();
         connectionStatus.LUX.uptimeStart = new Date(); // Set the uptime start
         saveConnectionStatus();
+
+        // If the initialPacket is not null, send it to LUX upon connection
+        if (initialPacket) {
+          luxSocket.write(initialPacket);
+          console.log(`Sent initial packet to LUX: ${initialPacket.toString('hex')}`);
+        }
       });
 
       luxSocket.on('data', (data) => {
@@ -183,7 +189,7 @@ function connectToLUX() {
         luxSocket = null;
         connectionStatus.LUX.connected = false;
         connectionStatus.LUX.disconnections += 1;
-        connectionStatus.LUX.uptimeStart = null; // Clear the uptime star
+        connectionStatus.LUX.uptimeStart = null; // Clear the uptime start
         saveConnectionStatus();
       });
 
@@ -200,12 +206,11 @@ function connectToLUX() {
       console.log('Disconnected from LUX');
       connectionStatus.LUX.connected = false;
       connectionStatus.LUX.disconnections += 1;
-      connectionStatus.LUX.uptimeStart = null; // Clear the uptime star
+      connectionStatus.LUX.uptimeStart = null; // Clear the uptime start
       saveConnectionStatus();
     }
   }
 }
-
 
 const tcpServer = net.createServer((socket) => {
   const remoteAddress = getNormalizedAddress(socket.remoteAddress);
@@ -297,10 +302,10 @@ function handleIncomingData(socket, data) {
       connectionStatus.HomeAssistant.connected = true; // Also update the connection status
       saveConnectionStatus();
     }
-    logPacket(sentPackets, data, true, source); // Log data sent to Home Assistant
+    logPacket(receivedPackets, data, true, source); // Log data sent to Home Assistant
   } else if (remoteAddress === normalizedLUX_IP) {
     source = 'LUX';
-    logPacket(sentPackets, data, true, source); // Log data sent to LUX
+    logPacket(receivedPackets, data, true, source); // Log data sent to LUX
   }
 
 
