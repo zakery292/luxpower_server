@@ -66,9 +66,9 @@
 </div>
 <div class="column connection-uptime">
   <h3>Uptime Monitor</h3>
-  <div id="dongleuptime">Dongle: <span class="status-dot" id="dongleStatusDot"></span></div>
-  <div id="luxuptime">LUX: <span class="status-dot" id="luxStatusDot"></span></div>
-  <div id="hauptime">Home Assistant: <span class="status-dot" id="haStatusDot"></span></div>
+  <div id="dongleuptime">Dongle: <span id="dongleUptime"></span></div>
+  <div id="luxuptime">LUX: <span id="luxUptime"></span></div>
+  <div id="hauptime">Home Assistant: <span id="haUptime"></span></div>
 </div>
 <div class="column connection-droprate">
   <h3>Droped Rate (connections)</h3>
@@ -85,16 +85,27 @@ function updateConnectionStatus() {
   fetch('api/connection-status')
     .then(response => response.json())
     .then(data => {
-      // Update the connection status in the web portal
-      // For example, change the color of the status dot based on the connection status
       document.getElementById('dongleStatusDot').className = data.Dongle.connected ? 'status-dot connected' : 'status-dot disconnected';
       document.getElementById('luxStatusDot').className = data.LUX.connected ? 'status-dot connected' : 'status-dot disconnected';
       document.getElementById('haStatusDot').className = data.HomeAssistant.connected ? 'status-dot connected' : 'status-dot disconnected';
+
+      // Format and display the uptime
+      document.getElementById('dongleUptime').textContent = formatUptime(data.Dongle.uptime);
+      document.getElementById('luxUptime').textContent = formatUptime(data.LUX.uptime);
+      document.getElementById('haUptime').textContent = formatUptime(data.HomeAssistant.uptime);
     })
     .catch(error => console.error('Error fetching connection status:', error));
 }
 
-// Update connection status every 5 seconds, or use the same interval as packet updates
+// Convert seconds to DD-HH-MM-SS format
+function formatUptime(uptime) {
+  const seconds = uptime % 60;
+  const minutes = Math.floor(uptime / 60) % 60;
+  const hours = Math.floor(uptime / 3600) % 24;
+  const days = Math.floor(uptime / 86400);
+  return `${days}d ${hours}h ${minutes}m ${seconds}s`;
+}
+
 setInterval(updateConnectionStatus, 5000);
 
 
