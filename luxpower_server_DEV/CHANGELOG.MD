@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Uptime Added 
 - Connection status added
 - Webserver can now send us data we cant send them data yet. this is for testing purposes to ensure commands we send are recorded and actioned by the inverter
+- Added Dongle Serial number field so we can match connection from nodeJS to the webserver for incoming commands from webportal. 
 
 
 ## fixed

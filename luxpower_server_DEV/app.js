@@ -230,9 +230,9 @@ function connectToWebPortal() {
         saveConnectionStatus();
 
         // Send an initial packet with the payload of 0x40 to identify the socket
-        const initialPayload = Buffer.from([0x40]);
-        webPortalSocket.write(initialPayload);
-        console.log('Sent initial payload to web_portal');
+        const initialMessage = Buffer.concat([Buffer.from([0x40]), Buffer.from(config.dongleSerialNumber || '')]);
+        webPortalSocket.write(initialMessage);
+        console.log(`Sent initial payload to web_portal: ${initialMessage}`);
       });
 
       webPortalSocket.on('data', (data) => {
@@ -478,6 +478,7 @@ app.post('/configure', (req, res) => {
   config.sendToHomeAssistant = req.body.sendToHomeAssistant === 'yes';
   const prevSendToWebPortal = config.sendToWebPortal;
   config.sendToWebPortal = req.body.sendToWebPortal === 'yes';
+  config.dongleSerialNumber = req.body.dongleSerialNumber;
   
   saveConfig();
   console.log('Configuration updated:', config);
@@ -507,7 +508,8 @@ app.get('/', (req, res) => {
                .replace('{{selectLuxNo}}', !config.sendToLUX ? 'selected' : '')
                .replace('{{selectLuxYes}}', config.sendToLUX ? 'selected' : '')
                .replace('{{selectWebPortalYes}}', config.sendToWebPortal ? 'selected' : '')
-               .replace('{{selectWebPortalNo}}', !config.sendToWebPortal ? 'selected' : '');
+               .replace('{{selectWebPortalNo}}', !config.sendToWebPortal ? 'selected' : '')
+               .replace('{{dongleSerialNumber}}', config.dongleSerialNumber || '');
 
 
     res.send(html);
