@@ -15,6 +15,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 const LUX_IP = '8.208.83.249';
 const LUX_PORT = 4346;
 const WEB_PORTAL_IP = '217.41.69.139'; // web_portal IP address
+const WEB_PORTAL_PORT = 4000; // web_portal port
 const CONNECTION_STATUS_FILE = '/data/connectionStatus.json';
 
 let connectionStatus = {
@@ -96,7 +97,7 @@ let config = {
 let sentPackets = [];
 let receivedPackets = [];
 
-
+let webPortalSocket = null;
 let dongleSocket = null;
 let homeAssistantSocket = null;
 let luxSocket = null;
@@ -213,6 +214,67 @@ function connectToLUX() {
     }
   }
 }
+
+
+
+
+function connectToWebPortal() {
+  if (config.sendToWebPortal) {
+    if (!webPortalSocket || webPortalSocket.destroyed) {
+      webPortalSocket = new net.Socket();
+      webPortalSocket.connect(WEB_PORTAL_PORT, WEB_PORTAL_IP, () => {
+        console.log('Connected to web_portal');
+        connectionStatus.WebPortal.connected = true;
+        connectionStatus.WebPortal.lastConnected = new Date();
+        connectionStatus.WebPortal.uptimeStart = new Date();
+        saveConnectionStatus();
+
+        // Send an initial packet with the payload of 0x40 to identify the socket
+        const initialPayload = Buffer.from([0x40]);
+        webPortalSocket.write(initialPayload);
+        console.log('Sent initial payload to web_portal');
+      });
+
+      webPortalSocket.on('data', (data) => {
+        // Assuming you might want to forward this data to the dongle
+        if (dongleSocket) {
+          dongleSocket.write(data);
+          console.log(`Received data from web_portal and forwarded to Dongle: ${data.toString('hex')}`);
+        }
+      });
+
+      webPortalSocket.on('close', () => {
+        console.log('Connection to web_portal closed');
+        webPortalSocket = null;
+        connectionStatus.WebPortal.connected = false;
+        connectionStatus.WebPortal.disconnections += 1;
+        connectionStatus.WebPortal.uptimeStart = null;
+        saveConnectionStatus();
+      });
+
+      webPortalSocket.on('error', (err) => {
+        console.error('Connection to web_portal error:', err);
+        webPortalSocket.destroy();
+        webPortalSocket = null;
+      });
+    }
+  } else {
+    if (webPortalSocket && !webPortalSocket.destroyed) {
+      webPortalSocket.destroy();
+      webPortalSocket = null;
+      console.log('Disconnected from web_portal');
+      connectionStatus.WebPortal.connected = false;
+      connectionStatus.WebPortal.disconnections += 1;
+      connectionStatus.WebPortal.uptimeStart = null;
+      saveConnectionStatus();
+    }
+  }
+}
+
+
+
+
+
 
 const tcpServer = net.createServer((socket) => {
   const remoteAddress = getNormalizedAddress(socket.remoteAddress);
@@ -425,7 +487,7 @@ app.post('/configure', (req, res) => {
     connectToLUX();
   }
   if (prevSendToWebPortal !== config.sendToWebPortal) {
-    // Add logic to connect or disconnect from web_portal if necessary
+    connectToWebPortal();
   }
 
   res.send('Configuration updated successfully');
