@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dropped connections added This will count every time a socket is closed as a dropped connection. The is a not problem that sometimes the donlge opens a new socket but never closes the first one i think this is a ESP issue im not sure.
 - Uptime Added 
 - Connection status added
+- Webserver can now send us data we cant send them data yet. this is for testing purposes to ensure commands we send are recorded and actioned by the inverter
+
 
 ## fixed
 - Disconnection and reconnection of LUX server connection at any point not just on server start

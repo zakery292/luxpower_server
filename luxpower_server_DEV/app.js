@@ -12,14 +12,16 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-const LUX_IP = '8.208.83.249'; // LUX IP address
-const LUX_PORT = 4346; // Assuming LUX listens on the same port
+const LUX_IP = '8.208.83.249';
+const LUX_PORT = 4346;
+const WEB_PORTAL_IP = '217.41.69.139'; // web_portal IP address
 const CONNECTION_STATUS_FILE = '/data/connectionStatus.json';
 
 let connectionStatus = {
   Dongle: { connected: false, lastConnected: null, disconnections: 0, uptimeStart: null },
   LUX: { connected: false, lastConnected: null, disconnections: 0, uptimeStart: null },
   HomeAssistant: { connected: false, lastConnected: null, disconnections: 0, uptimeStart: null },
+  WebPortal: { connected: false, lastConnected: null, disconnections: 0, uptimeStart: null }, // Added WebPortal status
 };
 
 function loadConnectionStatus() {
@@ -234,6 +236,14 @@ const tcpServer = net.createServer((socket) => {
     connectionStatus.HomeAssistant.uptimeStart = new Date();
     saveConnectionStatus();
   }
+  // Check if the connected client is web_portal
+  else if (remoteAddress === getNormalizedAddress(WEB_PORTAL_IP)) {
+    console.log('web_portal connected');
+    connectionStatus.WebPortal.connected = true;
+    connectionStatus.WebPortal.lastConnected = new Date();
+    connectionStatus.WebPortal.uptimeStart = new Date();
+    saveConnectionStatus();
+  }
 
   socket.on('data', (data) => {
     handleIncomingData(socket, data);
@@ -263,6 +273,13 @@ const tcpServer = net.createServer((socket) => {
       connectionStatus.LUX.disconnections += 1;
       connectionStatus.LUX.uptimeStart = null;
       saveConnectionStatus();
+    } else if (socket === webPortalSocket) {
+      console.log('web_portal socket closed');
+      webPortalSocket = null;
+      connectionStatus.WebPortal.connected = false;
+      connectionStatus.WebPortal.disconnections += 1;
+      connectionStatus.WebPortal.uptimeStart = null;
+      saveConnectionStatus();
     }
   });
 
@@ -289,6 +306,7 @@ function handleIncomingData(socket, data) {
   const normalizedDongleIP = getNormalizedAddress(config.dongleIP);
   const normalizedHomeAssistantIP = getNormalizedAddress(config.homeAssistantIP);
   const normalizedLUX_IP = getNormalizedAddress(LUX_IP);
+  const normalizedWebPortalIP = getNormalizedAddress(WEB_PORTAL_IP);
 
   if (remoteAddress === normalizedDongleIP) {
     source = 'Dongle';
@@ -306,6 +324,9 @@ function handleIncomingData(socket, data) {
   } else if (remoteAddress === normalizedLUX_IP) {
     source = 'LUX';
     logPacket(receivedPackets, data, true, source); // Log data sent to LUX
+  } else if (remoteAddress === normalizedWebPortalIP) { // Handling web_portal data
+    source = 'WebPortal';
+    logPacket(receivedPackets, data, true, source);
   }
 
 
@@ -341,6 +362,12 @@ function handleIncomingData(socket, data) {
       luxSocket.write(data);
       destinations.push('LUX');
     }
+  
+
+  if (config.sendToWebPortal && webPortalSocket) { 
+    webPortalSocket.write(data);
+    destinations.push('WebPortal');
+  }
   }
 
   // Handling data from Home Assistant
@@ -353,6 +380,14 @@ function handleIncomingData(socket, data) {
 
   // Handling data from LUX
   if (remoteAddress === normalizedLUX_IP) {
+    if (dongleSocket) {
+      dongleSocket.write(data);
+      destinations.push('Dongle');
+    }
+  }
+
+  if (remoteAddress === normalizedWebPortalIP) {
+    // Assuming you want to forward data from web_portal to the dongle
     if (dongleSocket) {
       dongleSocket.write(data);
       destinations.push('Dongle');
@@ -379,6 +414,8 @@ app.post('/configure', (req, res) => {
   const prevSendToLUX = config.sendToLUX;
   config.sendToLUX = req.body.sendToLUX === 'yes';
   config.sendToHomeAssistant = req.body.sendToHomeAssistant === 'yes';
+  const prevSendToWebPortal = config.sendToWebPortal;
+  config.sendToWebPortal = req.body.sendToWebPortal === 'yes';
   
   saveConfig();
   console.log('Configuration updated:', config);
@@ -386,6 +423,9 @@ app.post('/configure', (req, res) => {
   // Check if the LUX connection state should change
   if (prevSendToLUX !== config.sendToLUX) {
     connectToLUX();
+  }
+  if (prevSendToWebPortal !== config.sendToWebPortal) {
+    // Add logic to connect or disconnect from web_portal if necessary
   }
 
   res.send('Configuration updated successfully');
@@ -403,7 +443,10 @@ app.get('/', (req, res) => {
                .replace('{{selectHaNo}}', !config.sendToHomeAssistant ? 'selected' : '')
                .replace('{{selectHaYes}}', config.sendToHomeAssistant ? 'selected' : '')
                .replace('{{selectLuxNo}}', !config.sendToLUX ? 'selected' : '')
-               .replace('{{selectLuxYes}}', config.sendToLUX ? 'selected' : '');
+               .replace('{{selectLuxYes}}', config.sendToLUX ? 'selected' : '')
+               .replace('{{selectWebPortalYes}}', config.sendToWebPortal ? 'selected' : '')
+               .replace('{{selectWebPortalNo}}', !config.sendToWebPortal ? 'selected' : '');
+
 
     res.send(html);
   });
