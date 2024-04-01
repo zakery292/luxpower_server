@@ -230,7 +230,7 @@ function connectToWebPortal() {
         saveConnectionStatus();
 
         // Send an initial packet with the payload of 0x40 to identify the socket
-        const initialMessage = Buffer.concat([Buffer.from([0x40]), Buffer.from(config.dongleSerialNumber || '')]);
+        const initialMessage = Buffer.concat([Buffer.from([0x04]), Buffer.from(config.dongleSerialNumber || '')]);
         webPortalSocket.write(initialMessage);
         console.log(`Sent initial payload to web_portal: ${initialMessage}`);
       });
