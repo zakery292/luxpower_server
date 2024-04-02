@@ -178,6 +178,7 @@ function connectToLUX() {
         if (initialPacket) {
           luxSocket.write(initialPacket);
           luxReadyToSend = True;
+          console.log(`Flag set to:`, luxReadyToSend)
           console.log(`Sent initial packet to LUX: ${initialPacket.toString('hex')}`);
         }
       });
@@ -368,9 +369,9 @@ function handleIncomingData(socket, data) {
     }
     logPacket(receivedPackets, data, true, source); // Log data sent to Home Assistant
   } else if (remoteAddress === normalizedLUX_IP) {
-    luxReadyToSend = true;
-    luxPacketCount = 0;
-    console.log("LUX has requested data, ready to send up to 10 packets."); // lux anti spam logic Gives them 10 packets per request
+      luxReadyToSend = true;
+      luxPacketCount = 0;
+      console.log("LUX has requested data, ready to send up to 10 packets."); // lux anti spam logic Gives them 10 packets per request
     logPacket(receivedPackets, data, true, source); // Log data sent to LUX
   } else if (remoteAddress === normalizedWebPortalIP) { // Handling web_portal data
     source = 'WebPortal';
