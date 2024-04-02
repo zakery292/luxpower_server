@@ -416,15 +416,15 @@ function handleIncomingData(socket, data) {
       console.log(`Conditions not met to forward to Home Assistant.`);
     }
 
-    if (config.sendToLUX && luxSocket && luxReadyToSend && luxPacketCount < 25) {
+    if (config.sendToLUX && luxSocket && luxReadyToSend) {
       luxSocket.write(data);
       luxPacketCount++;
       destinations.push('LUX');
       console.log(`Data forwarded to LUX: ${data.toString('hex')}`);
-      if (luxPacketCount >= 25) {
-        luxReadyToSend = false;
-        console.log("Packet limit reached for LUX. Waiting for next request.");
-      }
+      //if (luxPacketCount >= 25) {
+       // luxReadyToSend = false;
+       // console.log("Packet limit reached for LUX. Waiting for next request.");
+     // }
     }
   }
   
