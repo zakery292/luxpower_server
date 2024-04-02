@@ -177,6 +177,7 @@ function connectToLUX() {
         // If the initialPacket is not null, send it to LUX upon connection
         if (initialPacket) {
           luxSocket.write(initialPacket);
+          luxReadyToSend = True;
           console.log(`Sent initial packet to LUX: ${initialPacket.toString('hex')}`);
         }
       });
