@@ -167,20 +167,31 @@ function connectToLUX() {
   if (config.sendToLUX) {
     if (!luxSocket || luxSocket.destroyed) {
       luxSocket = new net.Socket();
-      luxSocket.connect(LUX_PORT, LUX_IP, () => {
-        console.log('Connected to LUX');
-        connectionStatus.LUX.connected = true;
-        connectionStatus.LUX.lastConnected = new Date();
-        connectionStatus.LUX.uptimeStart = new Date(); // Set the uptime start
-        saveConnectionStatus();
-        luxSocket.write(initialPacket);
-        luxReadyToSend = True;
-        console.log(`Flag set to:`, luxReadyToSend)
-        console.log(`Sent initial packet to LUX: ${initialPacket.toString('hex')}`);
-        
-      });
+
+      const tryConnectToLUX = () => {
+        if (initialPacket) {
+          luxSocket.connect(LUX_PORT, LUX_IP, () => {
+            console.log('Connected to LUX');
+            connectionStatus.LUX.connected = true;
+            connectionStatus.LUX.lastConnected = new Date();
+            connectionStatus.LUX.uptimeStart = new Date(); // Set the uptime start
+            saveConnectionStatus();
+            if (initialPacket) {
+              luxSocket.write(initialPacket);
+              luxReadyToSend = true;
+              console.log(`Flag set to:`, luxReadyToSend);
+              console.log(`Sent initial packet to LUX: ${initialPacket.toString('hex')}`);
+            }
+          });
+        } else {
+          console.log('Initial packet is null, retrying in 10 seconds...');
+          setTimeout(tryConnectToLUX, 10000); // Retry after 10 seconds
+        }
+      };
+
+      tryConnectToLUX();
     }
-  } 
+  }
 }
 
 
