@@ -173,14 +173,11 @@ function connectToLUX() {
         connectionStatus.LUX.lastConnected = new Date();
         connectionStatus.LUX.uptimeStart = new Date(); // Set the uptime start
         saveConnectionStatus();
-
-        // If the initialPacket is not null, send it to LUX upon connection
-        if (initialPacket) {
-          luxSocket.write(initialPacket);
-          luxReadyToSend = True;
-          console.log(`Flag set to:`, luxReadyToSend)
-          console.log(`Sent initial packet to LUX: ${initialPacket.toString('hex')}`);
-        }
+        luxSocket.write(initialPacket);
+        luxReadyToSend = True;
+        console.log(`Flag set to:`, luxReadyToSend)
+        console.log(`Sent initial packet to LUX: ${initialPacket.toString('hex')}`);
+        
       });
     }
   } 
