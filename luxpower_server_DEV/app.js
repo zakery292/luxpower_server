@@ -180,40 +180,8 @@ function connectToLUX() {
           console.log(`Sent initial packet to LUX: ${initialPacket.toString('hex')}`);
         }
       });
-
-      luxSocket.on('data', (data) => {
-        if (dongleSocket) {
-          dongleSocket.write(data);
-          console.log(`Received data from LUX and forwarded to Dongle: ${data.toString('hex')}`);
-        }
-      });
-
-      luxSocket.on('close', () => {
-        console.log('Connection to LUX closed');
-        luxSocket = null;
-        connectionStatus.LUX.connected = false;
-        connectionStatus.LUX.disconnections += 1;
-        connectionStatus.LUX.uptimeStart = null; // Clear the uptime start
-        saveConnectionStatus();
-      });
-
-      luxSocket.on('error', (err) => {
-        console.error('Connection to LUX error:', err);
-        luxSocket.destroy();
-        luxSocket = null;
-      });
     }
-  } else {
-    if (luxSocket && !luxSocket.destroyed) {
-      luxSocket.destroy();
-      luxSocket = null;
-      console.log('Disconnected from LUX');
-      connectionStatus.LUX.connected = false;
-      connectionStatus.LUX.disconnections += 1;
-      connectionStatus.LUX.uptimeStart = null; // Clear the uptime start
-      saveConnectionStatus();
-    }
-  }
+  } 
 }
 
 
@@ -469,6 +437,7 @@ function handleIncomingData(socket, data) {
     if (dongleSocket) {
       dongleSocket.write(data);
       destinations.push('Dongle');
+      
     }
   }
 
@@ -477,6 +446,7 @@ function handleIncomingData(socket, data) {
     if (dongleSocket) {
       dongleSocket.write(data);
       destinations.push('Dongle');
+      
     }
   }
 
