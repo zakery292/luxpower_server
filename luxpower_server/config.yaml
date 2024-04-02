@@ -1,5 +1,5 @@
 name: Luxpower Dongle Server
-version: "2.03"
+version: "2.04"
 slug: luxpower_server_main
 description: "Dongle Server to connect to BH/BG Dongles to enable access into HA Via Luxpython. This server will only work with extral equipment purchased seperatly"
 url: "https://github.com/zakery292/luxpower_server/tree/main/luxpower_server"
@@ -20,3 +20,4 @@ ports:
   "4346/tcp": 4346
 ingress: true
 ingress_port: 3000
+panel_icon: mdi-solar-panel-large

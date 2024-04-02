@@ -15,14 +15,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dropped connections added This will count every time a socket is closed as a dropped connection. The is a not problem that sometimes the donlge opens a new socket but never closes the first one i think this is a ESP issue im not sure.
 - Uptime Added 
 - Connection status added
-- Webserver can now send us data we cant send them data yet. this is for testing purposes to ensure commands we send are recorded and actioned by the inverter
-- Added Dongle Serial number field so we can match connection from nodeJS to the webserver for incoming commands from webportal. 
+- Webserver is our new web portal, removed the ability for us to send data and left the webpage being able to send the donlge data.
+- Added Dongle Serial number field so we can match connection from nodeJS to the webserver for incoming commands from webportal.
+- Added Packet Counter for lux connections it only gets 10 packets per request from them to limit spam from us the them. 
 
 
 ## fixed
 - Disconnection and reconnection of LUX server connection at any point not just on server start
 - small bug fixes and code amendments 
 - If the homeassistant socket did not register but we are receiving data then update the socket reference and update the webpage with the new data
+- On socket drop the LUX connection will auto reconnect providing that it is enabled in the config
 
 ## Changed
 - Serverside logic for packet routing

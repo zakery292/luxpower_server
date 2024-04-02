@@ -6,7 +6,8 @@ const HTTP_PORT = 3000;
 const TCP_PORT = 4346;
 const fs = require('fs');
 const path = require('path');
-
+let luxReadyToSend = false;
+let luxPacketCount = 0;
 
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -335,8 +336,14 @@ const tcpServer = net.createServer((socket) => {
       connectionStatus.LUX.disconnections += 1;
       connectionStatus.LUX.uptimeStart = null;
       saveConnectionStatus();
+      
+      // Check if we should reconnect to LUX
+      if (config.sendToLUX) {
+        console.log('Attempting to reconnect to LUX...');
+        connectToLUX();
+      }
     } else if (socket === webPortalSocket) {
-      console.log('web_portal socket closed');
+      console.log('Web Portal socket closed');
       webPortalSocket = null;
       connectionStatus.WebPortal.connected = false;
       connectionStatus.WebPortal.disconnections += 1;
@@ -351,7 +358,15 @@ const tcpServer = net.createServer((socket) => {
     if (err.code === 'ECONNRESET') {
         console.log(`ECONNRESET error from ${remoteAddress}. This might indicate the dongle was restarted or there was a network issue.`);
     }
+    
+    // Destroy the socket to clean up resources
     socket.destroy();
+  
+    // Reconnect logic for LUX socket based on the config
+    if (socket === luxSocket && config.sendToLUX) {
+      console.log('Attempting to reconnect to LUX after an error...');
+      connectToLUX();
+    }
   });
 });
 
@@ -384,7 +399,9 @@ function handleIncomingData(socket, data) {
     }
     logPacket(receivedPackets, data, true, source); // Log data sent to Home Assistant
   } else if (remoteAddress === normalizedLUX_IP) {
-    source = 'LUX';
+    luxReadyToSend = true;
+    luxPacketCount = 0;
+    console.log("LUX has requested data, ready to send up to 10 packets."); // lux anti spam logic Gives them 10 packets per request
     logPacket(receivedPackets, data, true, source); // Log data sent to LUX
   } else if (remoteAddress === normalizedWebPortalIP) { // Handling web_portal data
     source = 'WebPortal';
@@ -420,17 +437,24 @@ function handleIncomingData(socket, data) {
       console.log(`Conditions not met to forward to Home Assistant.`);
     }
 
-    if (config.sendToLUX && luxSocket) {
+    if (config.sendToLUX && luxSocket && luxReadyToSend && luxPacketCount < 10) {
       luxSocket.write(data);
+      luxPacketCount++;
       destinations.push('LUX');
+      console.log(`Data forwarded to LUX: ${data.toString('hex')}`);
+      if (luxPacketCount >= 10) {
+        luxReadyToSend = false;
+        console.log("Packet limit reached for LUX. Waiting for next request.");
+      }
     }
+  }
   
 
-  if (config.sendToWebPortal && webPortalSocket) { 
-    webPortalSocket.write(data);
-    destinations.push('WebPortal');
-  }
-  }
+ // if (config.sendToWebPortal && webPortalSocket) { 
+   // webPortalSocket.write(data);
+   // destinations.push('WebPortal');
+  //}
+ // }
 
   // Handling data from Home Assistant
   if (remoteAddress === normalizedHomeAssistantIP) {
