@@ -377,6 +377,7 @@ function handleIncomingData(socket, data) {
     }
     logPacket(receivedPackets, data, true, source); // Log data sent to Home Assistant
   } else if (remoteAddress === normalizedLUX_IP) {
+      source = "LUX"
       luxReadyToSend = true;
       luxPacketCount = 0;
       console.log("LUX has requested data, ready to send up to 10 packets."); // lux anti spam logic Gives them 10 packets per request
@@ -415,12 +416,12 @@ function handleIncomingData(socket, data) {
       console.log(`Conditions not met to forward to Home Assistant.`);
     }
 
-    if (config.sendToLUX && luxSocket && luxReadyToSend && luxPacketCount < 10) {
+    if (config.sendToLUX && luxSocket && luxReadyToSend && luxPacketCount < 25) {
       luxSocket.write(data);
       luxPacketCount++;
       destinations.push('LUX');
       console.log(`Data forwarded to LUX: ${data.toString('hex')}`);
-      if (luxPacketCount >= 10) {
+      if (luxPacketCount >= 25) {
         luxReadyToSend = false;
         console.log("Packet limit reached for LUX. Waiting for next request.");
       }
