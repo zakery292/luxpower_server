@@ -203,6 +203,7 @@ function connectToLUX() {
         luxSocket.on('data', (data) => {
           if (dongleSocket) {
             dongleSocket.write(data);
+            source = "LUX"
             logPacket(sentPackets, data, true, source);
             console.log(`Received data from LUX and forwarded to Dongle: ${data.toString('hex')}`);
           }
