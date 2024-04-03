@@ -167,37 +167,56 @@ function connectToLUX() {
   if (config.sendToLUX) {
     if (!luxSocket || luxSocket.destroyed) {
       luxSocket = new net.Socket();
+      
+      
+      luxSocket.connect(LUX_PORT, LUX_IP, () => {
+        console.log('Connected to LUX');
+        connectionStatus.LUX.connected = true;
+        connectionStatus.LUX.lastConnected = new Date();
+        connectionStatus.LUX.uptimeStart = new Date(); // Set the uptime start
+        saveConnectionStatus();
 
-      luxSocket.on('error', (err) => {
-        console.error(`LUX Socket error: ${err}`);
-        connectionStatus.WebPortal.disconnections += 1;
-        connectionStatus.WebPortal.connected = false;
-        luxSocket = null; // Clear the socket to attempt a reconnection later
-        tryConnectToLUX();
-      });
-
-      const tryConnectToLUX = () => {
         if (initialPacket) {
-          luxSocket.connect(LUX_PORT, LUX_IP, () => {
-            console.log('Connected to LUX');
-            connectionStatus.LUX.connected = true;
-            connectionStatus.LUX.lastConnected = new Date();
-            connectionStatus.LUX.uptimeStart = new Date(); // Set the uptime start
-            saveConnectionStatus();
-            if (initialPacket) {
-              luxSocket.write(initialPacket);
-              luxReadyToSend = true;
-              console.log(`Flag set to:`, luxReadyToSend);
-              console.log(`Sent initial packet to LUX: ${initialPacket.toString('hex')}`);
-            }
-          });
+          luxSocket.write(initialPacket);
+          console.log(`Sent initial packet to LUX: ${initialPacket.toString('hex')}`);
         } else {
           console.log('Initial packet is null, retrying in 10 seconds...');
-          setTimeout(tryConnectToLUX, 10000); // Retry after 10 seconds
+          luxSocket = null;
+          setTimeout(connectToLUX, 10000); // Retry connection after 10 seconds
         }
-      };
+      });
 
-      tryConnectToLUX();
+      luxSocket.on('data', (data) => {
+        if (dongleSocket) {
+          dongleSocket.write(data);
+          console.log(`Received data from LUX and forwarded to Dongle: ${data.toString('hex')}`);
+        }
+      });
+
+      luxSocket.on('close', () => {
+        console.log('Connection to LUX closed');
+        luxSocket = null;
+        connectionStatus.LUX.connected = false;
+        connectionStatus.LUX.disconnections += 1;
+        connectionStatus.LUX.uptimeStart = null; // Clear the uptime start
+        saveConnectionStatus();
+      });
+
+      luxSocket.on('error', (err) => {
+        console.error('Connection to LUX error:', err);
+        luxSocket.destroy();
+        luxSocket = null;
+      });
+    }
+  } else {
+    if (luxSocket && !luxSocket.destroyed) {
+      luxSocket.destroy();
+      luxSocket = null;
+      console.log('Disconnected from LUX');
+      connectionStatus.LUX.connected = false;
+      connectionStatus.LUX.disconnections += 1;
+      connectionStatus.LUX.uptimeStart = null; // Clear the uptime start
+      saveConnectionStatus();
     }
   }
 }
@@ -385,10 +404,9 @@ function handleIncomingData(socket, data) {
     }
     logPacket(receivedPackets, data, true, source); // Log data sent to Home Assistant
   } else if (remoteAddress === normalizedLUX_IP) {
-      source = "LUX"
-      luxReadyToSend = true;
-      luxPacketCount = 0;
-      console.log("LUX has requested data, ready to send up to 10 packets."); // lux anti spam logic Gives them 10 packets per request
+    luxReadyToSend = true;
+    luxPacketCount = 0;
+    console.log("LUX has requested data, ready to send up to 10 packets."); // lux anti spam logic Gives them 10 packets per request
     logPacket(receivedPackets, data, true, source); // Log data sent to LUX
   } else if (remoteAddress === normalizedWebPortalIP) { // Handling web_portal data
     source = 'WebPortal';
@@ -424,24 +442,17 @@ function handleIncomingData(socket, data) {
       console.log(`Conditions not met to forward to Home Assistant.`);
     }
 
-    if (config.sendToLUX && luxSocket && luxReadyToSend) {
+    if (config.sendToLUX && luxSocket) {
       luxSocket.write(data);
-      luxPacketCount++;
       destinations.push('LUX');
-      console.log(`Data forwarded to LUX: ${data.toString('hex')}`);
-      //if (luxPacketCount >= 25) {
-       // luxReadyToSend = false;
-       // console.log("Packet limit reached for LUX. Waiting for next request.");
-     // }
     }
-  }
   
 
- // if (config.sendToWebPortal && webPortalSocket) { 
-   // webPortalSocket.write(data);
-   // destinations.push('WebPortal');
-  //}
- // }
+    //if (config.sendToWebPortal && webPortalSocket) { 
+     // webPortalSocket.write(data);
+     // destinations.push('WebPortal');
+    //}
+    }
 
   // Handling data from Home Assistant
   if (remoteAddress === normalizedHomeAssistantIP) {
@@ -456,7 +467,6 @@ function handleIncomingData(socket, data) {
     if (dongleSocket) {
       dongleSocket.write(data);
       destinations.push('Dongle');
-      
     }
   }
 
@@ -465,7 +475,6 @@ function handleIncomingData(socket, data) {
     if (dongleSocket) {
       dongleSocket.write(data);
       destinations.push('Dongle');
-      
     }
   }
 
