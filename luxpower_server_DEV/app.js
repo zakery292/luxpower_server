@@ -165,48 +165,49 @@ function getNormalizedAddress(address) {
 
 function connectToLUX() {
   if (config.sendToLUX) {
-    if (!luxSocket || luxSocket.destroyed) {
-      luxSocket = new net.Socket();
-      
-      
-      luxSocket.connect(LUX_PORT, LUX_IP, () => {
-        console.log('Connected to LUX');
-        connectionStatus.LUX.connected = true;
-        connectionStatus.LUX.lastConnected = new Date();
-        connectionStatus.LUX.uptimeStart = new Date(); // Set the uptime start
-        saveConnectionStatus();
+    if (!initialPacket) {
+      console.log('Initial packet is null, retrying in 10 seconds...');
+      setTimeout(connectToLUX, 10000); // Retry connection after 10 seconds
+    } else {
+      if (!luxSocket || luxSocket.destroyed) {
+        luxSocket = new net.Socket();
 
-        if (initialPacket) {
+        luxSocket.on('error', (err) => {
+          console.error('Connection to LUX error:', err);
+          luxSocket.destroy();
+          luxSocket = null;
+          connectionStatus.LUX.connected = false;
+          connectionStatus.LUX.disconnections += 1;
+          connectionStatus.LUX.uptimeStart = null; // Clear the uptime sta
+        });
+
+        luxSocket.connect(LUX_PORT, LUX_IP, () => {
+          console.log('Connected to LUX');
+          connectionStatus.LUX.connected = true;
+          connectionStatus.LUX.lastConnected = new Date();
+          connectionStatus.LUX.uptimeStart = new Date(); // Set the uptime start
+          saveConnectionStatus();
           luxSocket.write(initialPacket);
           console.log(`Sent initial packet to LUX: ${initialPacket.toString('hex')}`);
-        } else {
-          console.log('Initial packet is null, retrying in 10 seconds...');
+        });
+
+        luxSocket.on('close', () => {
+          console.log('Connection to LUX closed');
           luxSocket = null;
-          setTimeout(connectToLUX, 10000); // Retry connection after 10 seconds
-        }
-      });
+          connectionStatus.LUX.connected = false;
+          connectionStatus.LUX.disconnections += 1;
+          connectionStatus.LUX.uptimeStart = null;
+          saveConnectionStatus();
+        });
 
-      luxSocket.on('data', (data) => {
-        if (dongleSocket) {
-          dongleSocket.write(data);
-          console.log(`Received data from LUX and forwarded to Dongle: ${data.toString('hex')}`);
-        }
-      });
-
-      luxSocket.on('close', () => {
-        console.log('Connection to LUX closed');
-        luxSocket = null;
-        connectionStatus.LUX.connected = false;
-        connectionStatus.LUX.disconnections += 1;
-        connectionStatus.LUX.uptimeStart = null; // Clear the uptime start
-        saveConnectionStatus();
-      });
-
-      luxSocket.on('error', (err) => {
-        console.error('Connection to LUX error:', err);
-        luxSocket.destroy();
-        luxSocket = null;
-      });
+        luxSocket.on('data', (data) => {
+          if (dongleSocket) {
+            dongleSocket.write(data);
+            logPacket(sentPackets, data, true, source);
+            console.log(`Received data from LUX and forwarded to Dongle: ${data.toString('hex')}`);
+          }
+        });
+      }
     }
   } else {
     if (luxSocket && !luxSocket.destroyed) {
@@ -215,12 +216,11 @@ function connectToLUX() {
       console.log('Disconnected from LUX');
       connectionStatus.LUX.connected = false;
       connectionStatus.LUX.disconnections += 1;
-      connectionStatus.LUX.uptimeStart = null; // Clear the uptime start
+      connectionStatus.LUX.uptimeStart = null;
       saveConnectionStatus();
     }
   }
 }
-
 
 
 
