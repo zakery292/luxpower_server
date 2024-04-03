@@ -178,7 +178,8 @@ function connectToLUX() {
           luxSocket = null;
           connectionStatus.LUX.connected = false;
           connectionStatus.LUX.disconnections += 1;
-          connectionStatus.LUX.uptimeStart = null; // Clear the uptime sta
+          connectionStatus.LUX.uptimeStart = null;
+          connectToLUX() // Clear the uptime sta
         });
 
         luxSocket.connect(LUX_PORT, LUX_IP, () => {
@@ -198,6 +199,7 @@ function connectToLUX() {
           connectionStatus.LUX.disconnections += 1;
           connectionStatus.LUX.uptimeStart = null;
           saveConnectionStatus();
+          connectToLUX()
         });
 
         luxSocket.on('data', (data) => {
@@ -219,6 +221,7 @@ function connectToLUX() {
       connectionStatus.LUX.disconnections += 1;
       connectionStatus.LUX.uptimeStart = null;
       saveConnectionStatus();
+      connectToLUX()
     }
   }
 }
