@@ -168,6 +168,14 @@ function connectToLUX() {
     if (!luxSocket || luxSocket.destroyed) {
       luxSocket = new net.Socket();
 
+      luxSocket.on('error', (err) => {
+        console.error(`LUX Socket error: ${err}`);
+        connectionStatus.WebPortal.disconnections += 1;
+        connectionStatus.WebPortal.connected = false;
+        luxSocket = null; // Clear the socket to attempt a reconnection later
+        tryConnectToLUX();
+      });
+
       const tryConnectToLUX = () => {
         if (initialPacket) {
           luxSocket.connect(LUX_PORT, LUX_IP, () => {
