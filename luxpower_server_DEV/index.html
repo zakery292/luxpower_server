@@ -55,7 +55,16 @@
       </div>
       <input type="submit" value="Save Configuration">
     </form>
+    <div class="form-group">
+      <h2>Inject Packet</h2>
+      <form id="packetInjectionForm">
+          <label for="packetData">Packet Data:</label>
+          <input type="text" id="packetData" name="packetData" required>
+          <input type="submit" value="Inject Packet">
+      </form>
   </div>
+  </div>
+
   <div class="column packets">
     <h3>Sent Packets</h3>
     <div id="sentPackets">
@@ -135,6 +144,31 @@ function formatUptime(uptime) {
 setInterval(updateConnectionStatus, 5000);
 
 
+
+document.getElementById('packetInjectionForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const packetData = document.getElementById('packetData').value;
+    fetch('/api/inject-packet', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ data: packetData }),
+    })
+    .then(response => {
+        if (response.ok) {
+            alert('Packet injected successfully.');
+        } else {
+            alert('Error injecting packet');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error injecting packet');
+      });
+});
+    
 
 function updatePackets() {
   // Fetch and update sent packets

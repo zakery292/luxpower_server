@@ -494,6 +494,34 @@ function handleIncomingData(socket, data) {
 
 
 
+
+app.post('/api/inject-packet', (req, res) => {
+  const data = req.body.data;  // Assuming the data is sent under the key 'data'
+  console.log('Attempting to inject packet:', data);
+
+  if (!dongleSocket) {
+      console.error('Dongle socket is not connected.');
+      return res.status(500).send('Dongle socket is not connected.');
+  }
+
+  try {
+      dongleSocket.write(data, (error) => {
+          if (error) {
+              console.error('Error sending data to the dongle socket:', error);
+              return res.status(500).send('Error sending data to the dongle socket.');
+          }
+
+          console.log('Packet injected successfully');
+          res.send('Packet injected successfully');
+      });
+  } catch (error) {
+      console.error('Exception while sending data to the dongle socket:', error);
+      res.status(500).send('An error occurred while sending data to the dongle socket.');
+  }
+});
+
+
+
 app.post('/configure', (req, res) => {
   console.log('Received configuration:', req.body);
   
