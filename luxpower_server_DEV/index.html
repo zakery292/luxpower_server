@@ -5,21 +5,40 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Server Configuration</title>
 <link rel="stylesheet" type="text/css" href="styles.css">
-
+<script>
+  window.onload = function() {
+    const proxySelect = document.getElementById('proxySelect');
+    const dongleIpGroup = document.getElementById('dongleIpGroup');
+  
+    function toggleDongleIp() {
+      dongleIpGroup.style.display = proxySelect.value === 'yes' ? 'none' : 'block';
+    }
+  
+    proxySelect.addEventListener('change', toggleDongleIp);
+    toggleDongleIp(); // Initial call to set the correct display state
+  };
+  </script>
 
 
 </head>
 <body>
   <h1 class="main-heading">Server Monitoring & Configuration</h1>
 
-<div class="container">
-  <div class="column config">
-    <h2>Server Configuration</h2>
-    <form id="configurationForm" action="configure" method="post">
-      <div class="form-group">
-        <label>Dongle IP:</label>
-        <input type="text" name="dongleIP" value="{{dongleIP}}" required>
-      </div>
+  <div class="container">
+    <div class="column config">
+      <h2>Server Configuration</h2>
+      <form id="configurationForm" action="configure" method="post">
+        <div class="form-group" id="dongleIpGroup">
+          <label>Dongle IP:</label>
+          <input type="text" name="dongleIP" value="{{dongleIP}}" required>
+        </div>
+        <div class="form-group">
+          <label>Use Our server as proxy</label>
+          <select name="sendToWebPortal" id="proxySelect">
+            <option value="yes" {{isProxyYes}}>Enable</option>
+            <option value="no" {{isProxyNo}}>Disable</option>
+          </select>
+        </div>
       <div class="form-group">
         <label>Home Assistant IP:</label>
         <input type="text" name="homeAssistantIP" value="{{homeAssistantIP}}" required>

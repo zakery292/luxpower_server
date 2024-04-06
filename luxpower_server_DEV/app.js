@@ -93,6 +93,7 @@ let config = {
     homeAssistantIP: null,
     sendToLUX: false,
     sendToHomeAssistant: false, // Added flag for Home Assistant
+    isProxiedConnection: false,
   };
 
 let sentPackets = [];
@@ -243,14 +244,6 @@ function connectToWebPortal() {
         const initialMessage = Buffer.concat([Buffer.from([0x04]), Buffer.from(config.dongleSerialNumber || '')]);
         webPortalSocket.write(initialMessage);
         console.log(`Sent initial payload to web_portal: ${initialMessage}`);
-      });
-
-      webPortalSocket.on('data', (data) => {
-        // Assuming you might want to forward this data to the dongle
-        if (dongleSocket) {
-          dongleSocket.write(data);
-          console.log(`Received data from web_portal and forwarded to Dongle: ${data.toString('hex')}`);
-        }
       });
 
       webPortalSocket.on('close', () => {
@@ -422,63 +415,91 @@ function handleIncomingData(socket, data) {
 
   console.log(`${source} sent data: ${data.toString('hex')}`);
 
-  // Handling data from Dongle
-  if (remoteAddress === normalizedDongleIP) {
-    // Echo back logic
-    if (!initialPacket) {
-      initialPacket = data;
-      socket.write(data); // Echo back
-      destinations.push('Dongle (Echo back)');
-    } else if (data.equals(initialPacket)) {
-      socket.write(data); // Echo back
-      destinations.push('Dongle (Echo back)');
+  if (remoteAddress === getNormalizedAddress(config.dongleIP)) {
+    source = 'Dongle';
+    logPacket(receivedPackets, data, false, source);
+    // If proxied, bypass certain logic
+    if (!config.isProxiedConnection) {
+      // Echo back logic for direct connection
+      if (!initialPacket) {
+        initialPacket = data;
+        socket.write(data); // Echo back
+        destinations.push('Dongle (Echo back)');
+      } else if (data.equals(initialPacket)) {
+        socket.write(data); // Echo back
+        destinations.push('Dongle (Echo back)');
+      }
     }
+  } else if (remoteAddress === getNormalizedAddress(config.homeAssistantIP)) {
+    source = 'Home Assistant';
+    logPacket(receivedPackets, data, false, source);
+  }
 
-    if (dongleSocket === null) dongleSocket = socket;
+  console.log(`${source} sent data: ${data.toString('hex')}`);
 
-    console.log(`Attempting to forward to Home Assistant. sendToHomeAssistant: ${config.sendToHomeAssistant}, homeAssistantSocket: ${homeAssistantSocket ? "Exists" : "Does not exist"}`);
-    
+  // For direct connection, handle data from Dongle
+  if (!config.isProxiedConnection && source === 'Dongle') {
     if (config.sendToHomeAssistant && homeAssistantSocket) {
       homeAssistantSocket.write(data);
       destinations.push('Home Assistant');
       console.log(`Data forwarded to Home Assistant: ${data.toString('hex')}`);
-    } else {
-      console.log(`Conditions not met to forward to Home Assistant.`);
     }
-
     if (config.sendToLUX && luxSocket) {
       luxSocket.write(data);
       destinations.push('LUX');
     }
+    if (remoteAddress === normalizedHomeAssistantIP) {
+      if (dongleSocket) {
+        dongleSocket.write(data);
+        destinations.push('Dongle');
+      }
+    }
   
-
-    //if (config.sendToWebPortal && webPortalSocket) { 
-     // webPortalSocket.write(data);
-     // destinations.push('WebPortal');
-    //}
+    // Handling data from LUX
+    if (remoteAddress === normalizedLUX_IP) {
+      if (dongleSocket) {
+        dongleSocket.write(data);
+        destinations.push('Dongle');
+      }
     }
 
-  // Handling data from Home Assistant
+    if (destinations.length) {
+      console.log(`${source} sent data to: ${destinations.join(', ')}`);
+      destinations.forEach(destination => {
+        logPacket(sentPackets, data, true, source); // Log sent data for each destination
+      });
+    } else {
+      console.log(`${source} sent data, but no action taken: ${data.toString('hex')}`);
+    }
+      console.log(`Attempting to forward to Home Assistant. sendToHomeAssistant: ${config.sendToHomeAssistant}, homeAssistantSocket: ${homeAssistantSocket ? "Exists" : "Does not exist"}`);
+  }
+
+  // For proxied connection, handle data from Home Assistant to Web Portal
+  if (config.isProxiedConnection && source === 'Home Assistant') {
+    if (webPortalSocket) {
+      webPortalSocket.write(data);
+      destinations.push('Web Portal');
+      console.log(`Data forwarded to Web Portal: ${data.toString('hex')}`);
+    }
+    if (config.sendToLUX && luxSocket) {
+      luxSocket.write(data);
+      destinations.push('LUX');
+    }
+
+
+      // Handling data from Home Assistant
   if (remoteAddress === normalizedHomeAssistantIP) {
-    if (dongleSocket) {
-      dongleSocket.write(data);
-      destinations.push('Dongle');
+    if (webPortalSocket) {
+      webPortalSocket.write(data);
+      destinations.push('Web Portal');
     }
   }
 
   // Handling data from LUX
   if (remoteAddress === normalizedLUX_IP) {
-    if (dongleSocket) {
-      dongleSocket.write(data);
-      destinations.push('Dongle');
-    }
-  }
-
-  if (remoteAddress === normalizedWebPortalIP) {
-    // Assuming you want to forward data from web_portal to the dongle
-    if (dongleSocket) {
-      dongleSocket.write(data);
-      destinations.push('Dongle');
+    if (webPortalSocket) {
+      webPortalSocket.write(data);
+      destinations.push('Web Portal');
     }
   }
 
@@ -490,6 +511,12 @@ function handleIncomingData(socket, data) {
   } else {
     console.log(`${source} sent data, but no action taken: ${data.toString('hex')}`);
   }
+    console.log(`Attempting to forward to Home Assistant. sendToHomeAssistant: ${config.sendToHomeAssistant}, homeAssistantSocket: ${homeAssistantSocket ? "Exists" : "Does not exist"}`);
+  }
+
+    
+ 
+
 }
 
 
@@ -556,6 +583,8 @@ app.get('/', (req, res) => {
 
     // Replace configuration placeholders
     html = html.replace('{{dongleIP}}', config.dongleIP || '')
+               .replace('{{isProxyNo}}', !config.isProxiedConnection ? 'selected' : '')
+               .replace('{{isProxyYes}}', config.isProxiedConnection ? 'selected' : '')
                .replace('{{homeAssistantIP}}', config.homeAssistantIP || '')
                .replace('{{selectHaNo}}', !config.sendToHomeAssistant ? 'selected' : '')
                .replace('{{selectHaYes}}', config.sendToHomeAssistant ? 'selected' : '')
