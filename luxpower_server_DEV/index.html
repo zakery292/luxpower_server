@@ -149,7 +149,7 @@ document.getElementById('packetInjectionForm').addEventListener('submit', functi
     event.preventDefault();
 
     const packetData = document.getElementById('packetData').value;
-    fetch('/api/inject-packet', {
+    fetch('api/inject-packet', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
