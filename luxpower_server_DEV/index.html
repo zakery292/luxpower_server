@@ -5,40 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Server Configuration</title>
 <link rel="stylesheet" type="text/css" href="styles.css">
-<script>
-  window.onload = function() {
-    const proxySelect = document.getElementById('proxySelect');
-    const dongleIpGroup = document.getElementById('dongleIpGroup');
-  
-    function toggleDongleIp() {
-      dongleIpGroup.style.display = proxySelect.value === 'yes' ? 'none' : 'block';
-    }
-  
-    proxySelect.addEventListener('change', toggleDongleIp);
-    toggleDongleIp(); // Initial call to set the correct display state
-  };
-  </script>
+
 
 
 </head>
 <body>
   <h1 class="main-heading">Server Monitoring & Configuration</h1>
 
-  <div class="container">
-    <div class="column config">
-      <h2>Server Configuration</h2>
-      <form id="configurationForm" action="configure" method="post">
-        <div class="form-group" id="dongleIpGroup">
-          <label>Dongle IP:</label>
-          <input type="text" name="dongleIP" value="{{dongleIP}}" required>
-        </div>
-        <div class="form-group">
-          <label>Use Our server as proxy</label>
-          <select name="sendToWebPortal" id="proxySelect">
-            <option value="yes" {{isProxyYes}}>Enable</option>
-            <option value="no" {{isProxyNo}}>Disable</option>
-          </select>
-        </div>
+<div class="container">
+  <div class="column config">
+    <h2>Server Configuration</h2>
+    <form id="configurationForm" action="configure" method="post">
+      <div class="form-group">
+        <label>Dongle IP:</label>
+        <input type="text" name="dongleIP" value="{{dongleIP}}" required>
+      </div>
       <div class="form-group">
         <label>Home Assistant IP:</label>
         <input type="text" name="homeAssistantIP" value="{{homeAssistantIP}}" required>
@@ -74,16 +55,7 @@
       </div>
       <input type="submit" value="Save Configuration">
     </form>
-    <div class="form-group">
-      <h2>Inject Packet</h2>
-      <form id="packetInjectionForm">
-          <label for="packetData">Packet Data:</label>
-          <input type="text" id="packetData" name="packetData" required>
-          <input type="submit" value="Inject Packet">
-      </form>
   </div>
-  </div>
-
   <div class="column packets">
     <h3>Sent Packets</h3>
     <div id="sentPackets">
@@ -163,31 +135,6 @@ function formatUptime(uptime) {
 setInterval(updateConnectionStatus, 5000);
 
 
-
-document.getElementById('packetInjectionForm').addEventListener('submit', function(event) {
-    event.preventDefault();
-
-    const packetData = document.getElementById('packetData').value;
-    fetch('api/inject-packet', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ data: packetData }),
-    })
-    .then(response => {
-        if (response.ok) {
-            alert('Packet injected successfully.');
-        } else {
-            alert('Error injecting packet');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Error injecting packet');
-      });
-});
-    
 
 function updatePackets() {
   // Fetch and update sent packets
