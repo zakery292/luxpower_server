@@ -66,15 +66,7 @@ connectionStatus.Dongle.lastConnected = new Date();
 connectionStatus.Dongle.connected = false;
 connectionStatus.Dongle.disconnections += 1;
 
-//LUX connections and disconnections
-// Update these objects when connections are established or lost
 
-connectionStatus.LUX.connected = true;
-connectionStatus.LUX.lastConnected = new Date();
-
-// And when it disconnects:
-connectionStatus.LUX.connected = false;
-connectionStatus.LUX.disconnections += 1;
 
 //Home Assistant Connections and disconnections
 connectionStatus.HomeAssistant.connected = true;
@@ -163,123 +155,9 @@ function getNormalizedAddress(address) {
 }
 
 
-function connectToLUX() {
-  if (config.sendToLUX) {
-    if (!initialPacket) {
-      console.log('Initial packet is null, retrying in 10 seconds...');
-      setTimeout(connectToLUX, 10000); // Retry connection after 10 seconds
-    } else {
-      if (!luxSocket || luxSocket.destroyed) {
-        luxSocket = new net.Socket();
-
-        luxSocket.on('error', (err) => {
-          console.error('Connection to LUX error:', err);
-          luxSocket.destroy();
-          luxSocket = null;
-          connectionStatus.LUX.connected = false;
-          connectionStatus.LUX.disconnections += 1;
-          connectionStatus.LUX.uptimeStart = null;
-          connectToLUX() // Clear the uptime sta
-        });
-
-        luxSocket.connect(LUX_PORT, LUX_IP, () => {
-          console.log('Connected to LUX');
-          connectionStatus.LUX.connected = true;
-          connectionStatus.LUX.lastConnected = new Date();
-          connectionStatus.LUX.uptimeStart = new Date(); // Set the uptime start
-          saveConnectionStatus();
-          luxSocket.write(initialPacket);
-          console.log(`Sent initial packet to LUX: ${initialPacket.toString('hex')}`);
-        });
-
-        luxSocket.on('close', () => {
-          console.log('Connection to LUX closed');
-          luxSocket = null;
-          connectionStatus.LUX.connected = false;
-          connectionStatus.LUX.disconnections += 1;
-          connectionStatus.LUX.uptimeStart = null;
-          saveConnectionStatus();
-          connectToLUX()
-        });
-
-        luxSocket.on('data', (data) => {
-          if (dongleSocket) {
-            dongleSocket.write(data);
-            source = "LUX"
-            logPacket(sentPackets, data, true, source);
-            console.log(`Received data from LUX and forwarded to Dongle: ${data.toString('hex')}`);
-          }
-        });
-      }
-    }
-  } else {
-    if (luxSocket && !luxSocket.destroyed) {
-      luxSocket.destroy();
-      luxSocket = null;
-      console.log('Disconnected from LUX');
-      connectionStatus.LUX.connected = false;
-      connectionStatus.LUX.disconnections += 1;
-      connectionStatus.LUX.uptimeStart = null;
-      saveConnectionStatus();
-      connectToLUX()
-    }
-  }
-}
 
 
 
-function connectToWebPortal() {
-  if (config.sendToWebPortal) {
-    if (!webPortalSocket || webPortalSocket.destroyed) {
-      webPortalSocket = new net.Socket();
-      webPortalSocket.connect(WEB_PORTAL_PORT, WEB_PORTAL_IP, () => {
-        console.log('Connected to web_portal');
-        connectionStatus.WebPortal.connected = true;
-        connectionStatus.WebPortal.lastConnected = new Date();
-        connectionStatus.WebPortal.uptimeStart = new Date();
-        saveConnectionStatus();
-
-        // Send an initial packet with the payload of 0x40 to identify the socket
-        const initialMessage = Buffer.concat([Buffer.from([0x04]), Buffer.from(config.dongleSerialNumber || '')]);
-        webPortalSocket.write(initialMessage);
-        console.log(`Sent initial payload to web_portal: ${initialMessage}`);
-      });
-
-      webPortalSocket.on('data', (data) => {
-        // Assuming you might want to forward this data to the dongle
-        if (dongleSocket) {
-          dongleSocket.write(data);
-          console.log(`Received data from web_portal and forwarded to Dongle: ${data.toString('hex')}`);
-        }
-      });
-
-      webPortalSocket.on('close', () => {
-        console.log('Connection to web_portal closed');
-        webPortalSocket = null;
-        connectionStatus.WebPortal.connected = false;
-        connectionStatus.WebPortal.disconnections += 1;
-        connectionStatus.WebPortal.uptimeStart = null;
-        saveConnectionStatus();
-      });
-
-      webPortalSocket.on('error', (err) => {
-        console.error('Connection to web_portal error:', err);
-        webPortalSocket.destroy();
-        webPortalSocket = null;
-      });
-    }
-  } else {
-    if (webPortalSocket && !webPortalSocket.destroyed) {
-      webPortalSocket.destroy();
-      webPortalSocket = null;
-      console.log('Disconnected from web_portal');
-      connectionStatus.WebPortal.connected = false;
-      connectionStatus.WebPortal.disconnections += 1;
-      connectionStatus.WebPortal.uptimeStart = null;
-      saveConnectionStatus();
-    }
-  }
-}
 
 
 
@@ -308,14 +186,9 @@ const tcpServer = net.createServer((socket) => {
     connectionStatus.HomeAssistant.uptimeStart = new Date();
     saveConnectionStatus();
   }
-  // Check if the connected client is web_portal
-  else if (remoteAddress === getNormalizedAddress(WEB_PORTAL_IP)) {
-    console.log('web_portal connected');
-    connectionStatus.WebPortal.connected = true;
-    connectionStatus.WebPortal.lastConnected = new Date();
-    connectionStatus.WebPortal.uptimeStart = new Date();
-    saveConnectionStatus();
-  }
+
+
+
 
   socket.on('data', (data) => {
     handleIncomingData(socket, data);
@@ -338,26 +211,6 @@ const tcpServer = net.createServer((socket) => {
       connectionStatus.HomeAssistant.disconnections += 1;
       connectionStatus.HomeAssistant.uptimeStart = null;
       saveConnectionStatus();
-    } else if (socket === luxSocket) {
-      console.log('LUX socket closed');
-      luxSocket = null;
-      connectionStatus.LUX.connected = false;
-      connectionStatus.LUX.disconnections += 1;
-      connectionStatus.LUX.uptimeStart = null;
-      saveConnectionStatus();
-      
-      // Check if we should reconnect to LUX
-      if (config.sendToLUX) {
-        console.log('Attempting to reconnect to LUX...');
-        connectToLUX();
-      }
-    } else if (socket === webPortalSocket) {
-      console.log('Web Portal socket closed');
-      webPortalSocket = null;
-      connectionStatus.WebPortal.connected = false;
-      connectionStatus.WebPortal.disconnections += 1;
-      connectionStatus.WebPortal.uptimeStart = null;
-      saveConnectionStatus();
     }
   });
 
@@ -371,11 +224,6 @@ const tcpServer = net.createServer((socket) => {
     // Destroy the socket to clean up resources
     socket.destroy();
   
-    // Reconnect logic for LUX socket based on the config
-    if (socket === luxSocket && config.sendToLUX) {
-      console.log('Attempting to reconnect to LUX after an error...');
-      connectToLUX();
-    }
   });
 });
 
@@ -391,8 +239,6 @@ function handleIncomingData(socket, data) {
 
   const normalizedDongleIP = getNormalizedAddress(config.dongleIP);
   const normalizedHomeAssistantIP = getNormalizedAddress(config.homeAssistantIP);
-  const normalizedLUX_IP = getNormalizedAddress(LUX_IP);
-  const normalizedWebPortalIP = getNormalizedAddress(WEB_PORTAL_IP);
 
   if (remoteAddress === normalizedDongleIP) {
     source = 'Dongle';
@@ -407,14 +253,6 @@ function handleIncomingData(socket, data) {
       saveConnectionStatus();
     }
     logPacket(receivedPackets, data, true, source); // Log data sent to Home Assistant
-  } else if (remoteAddress === normalizedLUX_IP) {
-    luxReadyToSend = true;
-    luxPacketCount = 0;
-    console.log("LUX has requested data, ready to send up to 10 packets."); // lux anti spam logic Gives them 10 packets per request
-    logPacket(receivedPackets, data, true, source); // Log data sent to LUX
-  } else if (remoteAddress === normalizedWebPortalIP) { // Handling web_portal data
-    source = 'WebPortal';
-    logPacket(receivedPackets, data, true, source);
   }
 
 
@@ -466,21 +304,7 @@ function handleIncomingData(socket, data) {
     }
   }
 
-  // Handling data from LUX
-  if (remoteAddress === normalizedLUX_IP) {
-    if (dongleSocket) {
-      dongleSocket.write(data);
-      destinations.push('Dongle');
-    }
-  }
 
-  if (remoteAddress === normalizedWebPortalIP) {
-    // Assuming you want to forward data from web_portal to the dongle
-    if (dongleSocket) {
-      dongleSocket.write(data);
-      destinations.push('Dongle');
-    }
-  }
 
   if (destinations.length) {
     console.log(`${source} sent data to: ${destinations.join(', ')}`);
@@ -499,23 +323,9 @@ app.post('/configure', (req, res) => {
   
   config.dongleIP = req.body.dongleIP;
   config.homeAssistantIP = req.body.homeAssistantIP;
-  const prevSendToLUX = config.sendToLUX;
-  config.sendToLUX = req.body.sendToLUX === 'yes';
   config.sendToHomeAssistant = req.body.sendToHomeAssistant === 'yes';
-  const prevSendToWebPortal = config.sendToWebPortal;
-  config.sendToWebPortal = req.body.sendToWebPortal === 'yes';
-  config.dongleSerialNumber = req.body.dongleSerialNumber;
-  
   saveConfig();
   console.log('Configuration updated:', config);
-
-  // Check if the LUX connection state should change
-  if (prevSendToLUX !== config.sendToLUX) {
-    connectToLUX();
-  }
-  if (prevSendToWebPortal !== config.sendToWebPortal) {
-    connectToWebPortal();
-  }
 
   res.send('Configuration updated successfully');
 });
@@ -531,11 +341,6 @@ app.get('/', (req, res) => {
                .replace('{{homeAssistantIP}}', config.homeAssistantIP || '')
                .replace('{{selectHaNo}}', !config.sendToHomeAssistant ? 'selected' : '')
                .replace('{{selectHaYes}}', config.sendToHomeAssistant ? 'selected' : '')
-               .replace('{{selectLuxNo}}', !config.sendToLUX ? 'selected' : '')
-               .replace('{{selectLuxYes}}', config.sendToLUX ? 'selected' : '')
-               .replace('{{selectWebPortalYes}}', config.sendToWebPortal ? 'selected' : '')
-               .replace('{{selectWebPortalNo}}', !config.sendToWebPortal ? 'selected' : '')
-               .replace('{{dongleSerialNumber}}', config.dongleSerialNumber || '');
 
 
     res.send(html);
