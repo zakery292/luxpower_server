@@ -395,5 +395,4 @@ function loadConfig() {
 
 app.listen(HTTP_PORT, '0.0.0.0', () => {
     console.log(`Configuration server running at http://localhost:${HTTP_PORT}`);
-    connectToLUX();
 });
