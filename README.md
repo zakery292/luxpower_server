@@ -4,7 +4,7 @@
 
 The Luxpower Dongle Server is designed to interface with BH/BG serial number dongles, providing a secure, local connection to Home Assistant. This solution enhances network security by limiting the data sent externally, ensuring that all information remains within your local network.
 
-For the server to operate, an external device must be purchased separately from [Renewable Revolution](https://renwablerevolution.co.uk). This device acts as a relay between the dongle and your Home Assistant setup.
+For the server to operate, an external device must be purchased separately from [Monitor My Solar](https://monitormy.solar). This device acts as a relay between the dongle and your Home Assistant setup.
 
 [![Open your Home Assistant instance and show the add add-on repository dialog with a specific repository URL pre-filled.](https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg)](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2Fzakery292%2Fhomeassistant_nodjs)
 
