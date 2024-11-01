@@ -40,4 +40,4 @@ Leave the system running to begin receiving data in your Home Assistant instance
 
 ## Support
 
-For support and further inquiries, please visit [Renewable Revolution Support](https://renwablerevolution.co.uk/support).
+For support and further inquiries, please visit [Monitor My Solar](https://monitormy.solar).
